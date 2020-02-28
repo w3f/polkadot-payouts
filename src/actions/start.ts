@@ -1,6 +1,5 @@
 import winston from 'winston';
 
-import { AccountantConfig } from '../types';
 import { Config } from '../config';
 import { Accountant } from '../accountant';
 
@@ -21,10 +20,7 @@ export async function startAction(cmd: any) {
         ]
     });
 
-    const accountantConfig: AccountantConfig = {
-        transactions: cfg.transactions
-    };
-    const accountant = new Accountant(accountantConfig, logger);
+    const accountant = new Accountant(cfg.accountant, logger);
 
     await accountant.run();
 }
