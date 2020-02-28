@@ -2,15 +2,12 @@ import path from 'path';
 import process from 'process';
 
 import { Files } from './files';
-import { AccountantConfig } from './types';
 
 
 export class Config {
-    static parse(rawCfgPath: string): AccountantConfig {
+    static parse(rawCfgPath: string) {
         const cfgPath = path.resolve(process.cwd(), rawCfgPath);
 
-        const cfg = Files.readYAML(cfgPath) as AccountantConfig;
-
-        return cfg;
+        return Files.readYAML(cfgPath);
     }
 }
