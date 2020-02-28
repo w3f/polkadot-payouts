@@ -9,7 +9,7 @@
     "lint": "tslint -p tsconfig.json",
     "build": "tsc --build tsconfig.json",
     "test": "mocha --timeout 10000 --require ts-node/register --exit test/**/*.ts",
-    "start": "node ./dist/src/index.js"
+    "start": "node ./dist/src/index.js start"
   },
   "dependencies": {
     "@polkadot/api": "^1.4.2",
