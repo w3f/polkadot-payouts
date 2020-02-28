@@ -6,7 +6,7 @@ import { startAction } from './actions/start';
 
 program
     .command('start')
-    .description('Starts the watcher.')
+    .description('Starts the accountant.')
     .option('-c, --config [path]', 'Path to config file.', './config/main.yaml')
     .action(startAction);
 
