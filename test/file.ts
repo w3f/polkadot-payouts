@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import tmp from 'tmp';
 
-import { readYAML } from '../src/files';
+import { Files } from '../src/files';
 
 import { should } from 'chai';
 
@@ -14,7 +14,7 @@ describe('YAML file reader', () => {
         const tmpobj = tmp.fileSync();
         fs.writeSync(tmpobj.fd, fileContent);
 
-        const result = readYAML(tmpobj.name);
+        const result = Files.readYAML(tmpobj.name);
 
         result.should.eq(fileContent);
     });
@@ -27,7 +27,7 @@ describe('YAML file reader', () => {
         const tmpobj = tmp.fileSync();
         fs.writeSync(tmpobj.fd, fileContent);
 
-        (() => { readYAML(tmpobj.name) }).should.throw();
+        (() => { Files.readYAML(tmpobj.name) }).should.throw();
     });
 
 });

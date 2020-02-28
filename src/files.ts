@@ -3,8 +3,10 @@ import path from 'path';
 import yaml from 'js-yaml';
 
 
-export function readYAML(filePath: string) {
-    const rawContent = fs.readFileSync(path.resolve(__dirname, filePath)).toString();
+export class Files {
+    static readYAML(filePath: string) {
+        const rawContent = fs.readFileSync(path.resolve(__dirname, filePath)).toString();
 
-    return yaml.safeLoad(rawContent);
+        return yaml.safeLoad(rawContent);
+    }
 }
