@@ -1,6 +1,17 @@
 version: 2
 
 jobs:
+  unitTests:
+    docker:
+      - image: node:10.15-alpine
+    steps:
+      - checkout
+      - run: yarn
+      - run:
+          name: Run tests
+          command: |
+            yarn test
+
   buildImage:
     docker:
       - image: web3f/ci-commons:v1.8.0
@@ -11,7 +22,7 @@ jobs:
           command: |
             /scripts/build-image.sh web3f/accountant .
 
-  lint:
+  helmLint:
     docker:
       - image: web3f/ci-commons:v1.8.0
     steps:
@@ -54,7 +65,11 @@ workflows:
   version: 2
   test_and_deploy:
     jobs:
-      - lint:
+      - unitTests:
+          filters:
+            tags:
+              only: /.*/
+      - helmLint:
           filters:
             tags:
               only: /.*/
@@ -68,7 +83,7 @@ workflows:
               only: /.*/
           requires:
             - buildImage
-            - lint
+            - helmLint
       - publishImage:
           filters:
             branches:
