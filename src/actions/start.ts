@@ -1,5 +1,6 @@
 import winston from 'winston';
 
+import { Client } from '../client';
 import { Config } from '../config';
 import { Accountant } from '../accountant';
 
@@ -19,8 +20,9 @@ export async function startAction(cmd: any) {
             new winston.transports.Console()
         ]
     });
+    const client = new Client(cfg.wsEndpoint, logger)
 
-    const accountant = new Accountant(cfg.accountant, logger);
+    const accountant = new Accountant(cfg.transactions, client, logger);
 
     await accountant.run();
 }

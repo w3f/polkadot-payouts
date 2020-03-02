@@ -29,12 +29,8 @@ export interface Transaction {
 }
 
 
-export interface AccountantConfig {
-    wsEndpoint: string,
-    transactions: Array<Transaction>,
-};
-
 export interface InputConfig {
-    accountant: AccountantConfig,
+    transactions: Array<Transaction>,
+    wsEndpoint: string,
     logLevel: string
 }
