@@ -1,14 +1,12 @@
-import winston from 'winston';
-
 import { Client } from './client';
-import { Transaction } from './types';
+import { Transaction, Logger } from './types';
 
 export class Accountant {
     transactions: Array<Transaction>;
-    logger: winston.Logger;
+    logger: Logger;
     client: Client;
 
-    constructor(transactions: Array<Transaction>, client: Client, logger: winston.Logger) {
+    constructor(transactions: Array<Transaction>, client: Client, logger: Logger) {
         this.transactions = transactions;
         this.logger = logger;
         this.client = client;

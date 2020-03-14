@@ -34,3 +34,7 @@ export interface InputConfig {
     wsEndpoint: string,
     logLevel: string
 }
+
+export interface Logger {
+    info: (msg: string) => void;
+}

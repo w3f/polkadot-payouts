@@ -6,13 +6,13 @@ import { bufferToU8a } from '@polkadot/util';
 import bs58 from 'bs58';
 import { waitReady } from '@polkadot/wasm-crypto';
 
-import winston from 'winston';
+import { Logger } from './types';
 
 export class Client {
     api: ApiPromise;
-    logger: winston.Logger;
+    logger: Logger;
 
-    constructor(wsEndpoint: string, logger: winston.Logger) {
+    constructor(wsEndpoint: string, logger: Logger) {
         this.initApi(wsEndpoint);
         this.logger = logger;
     }
