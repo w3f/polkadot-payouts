@@ -1,0 +1,24 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  schedule: {{ .Values.schedule | quote }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: {{ .Release.Name }}
+          containers:
+          - name: {{ .Release.Name }}
+            image: {{ .Values.image.repo }}:{{ .Values.image.tag }}
+            volumeMounts:
+            {{ range .Values.transactions }}
+            - name:
+              valueFrom:
+                secretKeyRef:
+                  name: {{ . }}
+                  key:
+            {{ end }}
+          restartPolicy: Never
