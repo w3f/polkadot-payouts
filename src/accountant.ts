@@ -33,7 +33,7 @@ export class Accountant {
     }
 
     private async processTx(tx: Transaction) {
-        const amount = this.determineAmount(tx.restriction);
+        const amount = await this.determineAmount(tx.restriction, tx.sender.address, tx.receiver.address);
         return this.client.send(tx.sender.keystore, tx.receiver.address, amount);
     }
 
@@ -41,7 +41,9 @@ export class Accountant {
         return this.client.claim(claim.keystore);
     }
 
-    private determineAmount(restriction: TransactionRestriction): number {
+    private async determineAmount(restriction: TransactionRestriction, senderAddr: string, receiverAddr: string): Promise<number> {
+
+
         return 0;
     }
 }
