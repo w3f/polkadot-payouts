@@ -8,6 +8,14 @@ import { Balance } from '@polkadot/types/interfaces';
 
 should();
 
+type checkReceiverInput = {
+    senderBalance?: number,
+    receiverBalance?: number,
+    remaining?: number,
+    desired?: number,
+    expectedSent?: number
+}
+
 const sandbox = sinon.createSandbox();
 const keystore1 = {
     fileSecret: "filesecret1",
@@ -70,60 +78,61 @@ describe('Accountant', () => {
             const subject = new Accountant(defaultTransactions(), [], client, logger);
 
             const stub = sandbox.stub(client, 'send');
-            const balanceOfStub = sandbox.stub(client, 'balanceOf');
-
-            const senderBalance = new BN(200) as Balance;
-            balanceOfStub.onFirstCall().resolves(senderBalance);
-            balanceOfStub.onSecondCall().resolves(senderBalance);
-            const expectedSent = senderBalance.sub(new BN((1))) as Balance;
 
             await subject.run();
 
             stub.calledTwice.should.be.true;
-            stub.calledWith(keystore1, receiverAddr1, expectedSent).should.be.true;
-            stub.calledWith(keystore2, receiverAddr2, expectedSent).should.be.true;
         });
 
         describe('restrictions', () => {
             it('should implement remaining', async () => {
-                await checkRemaining({
-                    totalBalance: 250,
+                await checkRestriction({
+                    senderBalance: 250,
                     remaining: 100,
                     desired: 0,
                     expectedSent: 150
                 });
             });
             it('should default remaining to 1 if not defined', async () => {
-                await checkRemaining({
-                    totalBalance: 250,
+                await checkRestriction({
+                    senderBalance: 250,
                     remaining: 0,
                     desired: 0,
                     expectedSent: 249
                 });
             });
             it('should return 0 if sender balance is less than 1', async () => {
-                await checkRemaining({
-                    totalBalance: 0.5,
+                await checkRestriction({
+                    senderBalance: 0.5,
                     remaining: 0,
                     desired: 0,
                     expectedSent: 0
                 });
             });
-            it('should return 0 if remaining is less than 1');
-            it('should implement desired');
+            it('should return 0 if remaining is less than 1', async () => {
+                await checkRestriction({
+                    senderBalance: 200,
+                    remaining: 0.5,
+                    desired: 0,
+                    expectedSent: 0
+                });
+            });
+            it('should implement desired', async () => {
+                await checkRestriction({
+                    senderBalance: 200,
+                    receiverBalance: 50,
+                    remaining: 0,
+                    desired: 100,
+                    expectedSent: 50
+                });
+            });
             it('should return 0 if receiver balance is >= desired');
-            it('should return ');
             it('should implement remaining instead of desired if both are present');
         });
     });
 });
 
-async function checkRemaining(cfg: {
-    totalBalance: number,
-    remaining: number,
-    desired: number,
-    expectedSent: number
-}) {
+async function checkRestriction(cfg: checkReceiverInput) {
     const txs = defaultTransactions();
 
     txs.pop();
@@ -138,8 +147,10 @@ async function checkRemaining(cfg: {
     const sendStub = sandbox.stub(client, 'send');
     const balanceOfStub = sandbox.stub(client, 'balanceOf');
 
-    const senderBalance = new BN(cfg.totalBalance) as Balance;
+    const senderBalance = new BN(cfg.senderBalance) as Balance;
+    const receiverBalance = new BN(cfg.receiverBalance) as Balance;
     balanceOfStub.onFirstCall().resolves(senderBalance);
+    balanceOfStub.onSecondCall().resolves(receiverBalance);
 
     await subject.run();
 

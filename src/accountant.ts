@@ -48,6 +48,8 @@ export class Accountant {
         let remaining = restriction.remaining;
         if (remaining == 0) {
             remaining = 1;
+        } else if (remaining < 1) {
+            return new BN(0) as Balance;
         }
         const remainingBN = new BN(remaining);
 
