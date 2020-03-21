@@ -75,42 +75,35 @@ describe('Accountant', () => {
             const senderBalance = new BN(200) as Balance;
             balanceOfStub.onFirstCall().resolves(senderBalance);
             balanceOfStub.onSecondCall().resolves(senderBalance);
+            const expectedSent = senderBalance.sub(new BN((1))) as Balance;
 
             await subject.run();
 
             stub.calledTwice.should.be.true;
-            stub.calledWith(keystore1, receiverAddr1, senderBalance).should.be.true;
-            stub.calledWith(keystore2, receiverAddr2, senderBalance).should.be.true;
+            stub.calledWith(keystore1, receiverAddr1, expectedSent).should.be.true;
+            stub.calledWith(keystore2, receiverAddr2, expectedSent).should.be.true;
         });
 
         describe('restrictions', () => {
             it('should implement remaining', async () => {
-                const txs = defaultTransactions();
-                const totalBalance = 250;
-                const desiredRemaining = 100;
-                const expectedSent = 150;
-
-                txs.pop();
-
-                txs[0].restriction = {
-                    remaining: desiredRemaining,
-                    desired: 0
-                };
-
-                const subject = new Accountant(txs, [], client, logger);
-
-                const sendStub = sandbox.stub(client, 'send');
-                const balanceOfStub = sandbox.stub(client, 'balanceOf');
-
-                const senderBalance = new BN(totalBalance) as Balance;
-                balanceOfStub.onFirstCall().resolves(senderBalance);
-
-                await subject.run();
-
-                sendStub.calledWith(keystore1, receiverAddr1, new BN(expectedSent) as Balance).should.be.true;
+                await checkRemaining({
+                    totalBalance: 250,
+                    remaining: 100,
+                    desired: 0,
+                    expectedSent: 150
+                });
             });
-            it('should default remaining to 1 if not defined');
-            it('should return 0 if sender balance is less than 1');
+            it('should default remaining to 1 if not defined', async () => {
+                await checkRemaining({
+                    totalBalance: 250,
+                    remaining: 0,
+                    desired: 0,
+                    expectedSent: 249
+                });
+            });
+            it('should return 0 if sender balance is less than 1', async () => {
+
+            });
             it('should return 0 if remaining is less than 1');
             it('should implement desired');
             it('should return 0 if receiver balance is >= desired');
@@ -119,3 +112,31 @@ describe('Accountant', () => {
         });
     });
 });
+
+async function checkRemaining(cfg: {
+    totalBalance: number,
+    remaining: number,
+    desired: number,
+    expectedSent: number
+}) {
+    const txs = defaultTransactions();
+
+    txs.pop();
+
+    txs[0].restriction = {
+        remaining: cfg.remaining,
+        desired: cfg.desired,
+    };
+
+    const subject = new Accountant(txs, [], client, logger);
+
+    const sendStub = sandbox.stub(client, 'send');
+    const balanceOfStub = sandbox.stub(client, 'balanceOf');
+
+    const senderBalance = new BN(cfg.totalBalance) as Balance;
+    balanceOfStub.onFirstCall().resolves(senderBalance);
+
+    await subject.run();
+
+    sendStub.calledWith(keystore1, receiverAddr1, new BN(cfg.expectedSent) as Balance).should.be.true;
+}
