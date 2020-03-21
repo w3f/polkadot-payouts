@@ -6,18 +6,15 @@ import {
     ValidatorRewardClaim
 } from './types';
 
-export class Accountant {
-    transactions: Array<Transaction>;
-    validatorRewardClaims: Array<ValidatorRewardClaim>;
-    logger: Logger;
-    client: Client;
+import { Balance } from '@polkadot/types/interfaces';
+import BN from 'bn.js';
 
-    constructor(transactions: Array<Transaction>, validatorRewardClaims: Array<ValidatorRewardClaim>, client: Client, logger: Logger) {
-        this.transactions = transactions;
-        this.validatorRewardClaims = validatorRewardClaims;
-        this.logger = logger;
-        this.client = client;
-    }
+export class Accountant {
+    constructor(
+        private transactions: Array<Transaction>,
+        private validatorRewardClaims: Array<ValidatorRewardClaim>,
+        private client: Client,
+        private logger: Logger) { }
 
     async run() {
         if (this.transactions.length > 0) {
@@ -34,6 +31,7 @@ export class Accountant {
 
     private async processTx(tx: Transaction) {
         const amount = await this.determineAmount(tx.restriction, tx.sender.address, tx.receiver.address);
+
         return this.client.send(tx.sender.keystore, tx.receiver.address, amount);
     }
 
@@ -41,9 +39,11 @@ export class Accountant {
         return this.client.claim(claim.keystore);
     }
 
-    private async determineAmount(restriction: TransactionRestriction, senderAddr: string, receiverAddr: string): Promise<number> {
+    private async determineAmount(restriction: TransactionRestriction, senderAddr: string, receiverAddr: string): Promise<Balance> {
+        const senderBalance = await this.client.balanceOf(senderAddr);
 
+        const remainingBN = new BN(restriction.remaining);
 
-        return 0;
+        return senderBalance.sub(remainingBN) as Balance;
     }
 }

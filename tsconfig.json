@@ -12,5 +12,5 @@
       "node_modules",
       "**/*.spec.ts"
   ],
-  "_comment": "The polkadot @util lib contains typescript errors"
+  "_comment": "The accountant app contains typescript errors"
 }

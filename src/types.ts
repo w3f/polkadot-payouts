@@ -1,3 +1,5 @@
+import { Balance } from '@polkadot/types/interfaces';
+
 export interface Keystore {
     fileSecret: string,
     passwordSecret: string
@@ -12,15 +14,10 @@ interface TransactionSender extends TransactionActor {
     keystore: Keystore
 }
 
-interface RemainingTransactionRestriction {
-    remaining: number
-}
-
-interface DesiredTransactionRestriction {
+export type TransactionRestriction = {
+    remaining: number,
     desired: number
 }
-
-export type TransactionRestriction = RemainingTransactionRestriction | DesiredTransactionRestriction
 
 export interface Transaction {
     sender: TransactionSender,
@@ -44,6 +41,7 @@ export interface Logger {
 }
 
 export interface Client {
-    send: (keystore: Keystore, recipentAddress: string, amount: number) => void
+    send: (keystore: Keystore, recipentAddress: string, amount: Balance) => void
+    balanceOf: (addr: string) => Promise<Balance>
     claim: (keystore: Keystore) => void
 }

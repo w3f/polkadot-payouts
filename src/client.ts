@@ -1,6 +1,7 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Keyring } from '@polkadot/keyring';
 import { createType, GenericImmortalEra } from '@polkadot/types';
+import { Balance } from '@polkadot/types/interfaces'
 import { decodeAddress } from '@polkadot/util-crypto';
 import { bufferToU8a } from '@polkadot/util';
 import bs58 from 'bs58';
@@ -15,6 +16,11 @@ export class Client {
     constructor(wsEndpoint: string, logger: Logger) {
         this.initApi(wsEndpoint);
         this.logger = logger;
+    }
+
+    public async balanceOf(addr: string): Promise<Balance> {
+        const account = await this.api.query.system.account(addr);
+        return account.data.free;
     }
 
     private async initApi(wsEndpoint: string) {
