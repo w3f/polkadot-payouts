@@ -102,7 +102,12 @@ describe('Accountant', () => {
                 });
             });
             it('should return 0 if sender balance is less than 1', async () => {
-
+                await checkRemaining({
+                    totalBalance: 0.5,
+                    remaining: 0,
+                    desired: 0,
+                    expectedSent: 0
+                });
             });
             it('should return 0 if remaining is less than 1');
             it('should implement desired');

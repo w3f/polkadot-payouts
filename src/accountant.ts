@@ -40,7 +40,11 @@ export class Accountant {
     }
 
     private async determineAmount(restriction: TransactionRestriction, senderAddr: string, receiverAddr: string): Promise<Balance> {
-        const senderBalance = await this.client.balanceOf(senderAddr);
+        const senderBalance: Balance = await this.client.balanceOf(senderAddr);
+        if (senderBalance.lt(new BN(1) as Balance)) {
+            return new BN(0) as Balance;
+        }
+
         let remaining = restriction.remaining;
         if (remaining == 0) {
             remaining = 1;
