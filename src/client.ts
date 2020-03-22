@@ -7,7 +7,7 @@ import { bufferToU8a } from '@polkadot/util';
 import bs58 from 'bs58';
 import { waitReady } from '@polkadot/wasm-crypto';
 
-import { Logger } from './types';
+import { Logger, Keystore } from './types';
 
 export class Client {
     api: ApiPromise;
@@ -23,6 +23,8 @@ export class Client {
         return account.data.free;
     }
 
+    public async send(keystore: Keystore, recipentAddress: string, amount: Balance): Promise<void> { }
+    public async claim(keystore: Keystore): Promise<void> { }
     private async initApi(wsEndpoint: string) {
         const provider = new WsProvider(wsEndpoint);
         this.api = await ApiPromise.create({ provider });

@@ -41,7 +41,7 @@ export interface Logger {
 }
 
 export interface Client {
-    send: (keystore: Keystore, recipentAddress: string, amount: Balance) => void
+    send: (keystore: Keystore, recipentAddress: string, amount: Balance) => Promise<void>
     balanceOf: (addr: string) => Promise<Balance>
-    claim: (keystore: Keystore) => void
+    claim: (keystore: Keystore) => Promise<void>
 }

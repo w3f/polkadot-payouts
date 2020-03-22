@@ -9,12 +9,12 @@ export class LoggerMock {
 }
 
 export class ClientMock {
-    send(keystore: Keystore, recipentAddress: string, amount: Balance) {
+    async send(keystore: Keystore, recipentAddress: string, amount: Balance): Promise<void> {
     }
     async balanceOf(addr: string): Promise<Balance> {
         return new BN(10) as Balance;
     }
-    claim() {
+    async claim(keystore: Keystore): Promise<void> {
 
     }
 }
