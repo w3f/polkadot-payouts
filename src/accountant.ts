@@ -44,10 +44,12 @@ export class Accountant {
         if (senderBalance.lt(new BN(1) as Balance)) {
             return new BN(0) as Balance;
         }
+        const receiverBalance: Balance = await this.client.balanceOf(receiverAddr);
 
         let remaining = restriction.remaining;
-        if (remaining == 0) {
-            remaining = 1;
+        if (remaining == 0 && restriction.desired != 0) {
+            const desired = new BN(restriction.desired);
+            return desired.sub(receiverBalance) as Balance;
         } else if (remaining < 1) {
             return new BN(0) as Balance;
         }

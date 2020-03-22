@@ -93,14 +93,6 @@ describe('Accountant', () => {
                     expectedSent: 150
                 });
             });
-            it('should default remaining to 1 if not defined', async () => {
-                await checkRestriction({
-                    senderBalance: 250,
-                    remaining: 0,
-                    desired: 0,
-                    expectedSent: 249
-                });
-            });
             it('should return 0 if sender balance is less than 1', async () => {
                 await checkRestriction({
                     senderBalance: 0.5,
@@ -127,7 +119,7 @@ describe('Accountant', () => {
                 });
             });
             it('should return 0 if receiver balance is >= desired');
-            it('should implement remaining instead of desired if both are present');
+            it('should return 0 if both remaining and desired are present');
         });
     });
 });
