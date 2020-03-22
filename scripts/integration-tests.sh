@@ -24,7 +24,7 @@ wait_job_present(){
 run_tests() {
     echo Running tests...
 
-    wait_job_present accountant
+    wait_job_present accountant accountant
 }
 
 teardown() {

@@ -2,7 +2,7 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: {{ .Release.Name }}
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.namespace.name }}
 spec:
   schedule: {{ .Values.schedule | quote }}
   jobTemplate:
