@@ -118,7 +118,24 @@ describe('Accountant', () => {
                     expectedSent: 50
                 });
             });
-            it('should return 0 if receiver balance is >= desired');
+            it('should return 0 if receiver balance is >= desired', async () => {
+                await checkRestriction({
+                    senderBalance: 200,
+                    receiverBalance: 300,
+                    remaining: 0,
+                    desired: 100,
+                    expectedSent: 0
+                });
+            });
+            it('should send desired on best effort', async () => {
+                await checkRestriction({
+                    senderBalance: 10,
+                    receiverBalance: 50,
+                    remaining: 0,
+                    desired: 100,
+                    expectedSent: 9
+                });
+            });
             it('should return 0 if both remaining and desired are present');
         });
     });
@@ -146,5 +163,6 @@ async function checkRestriction(cfg: checkReceiverInput) {
 
     await subject.run();
 
-    sendStub.calledWith(keystore1, receiverAddr1, new BN(cfg.expectedSent) as Balance).should.be.true;
+    const expectedSent = new BN(cfg.expectedSent) as Balance;
+    sendStub.calledWith(keystore1, receiverAddr1, expectedSent).should.be.true;
 }

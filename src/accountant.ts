@@ -9,7 +9,11 @@ import {
 import { Balance } from '@polkadot/types/interfaces';
 import BN from 'bn.js';
 
+
 export class Accountant {
+    private readonly zeroBalance = new BN(0) as Balance;
+    private readonly minimumSenderBalance = new BN(1) as Balance;
+
     constructor(
         private transactions: Array<Transaction>,
         private validatorRewardClaims: Array<ValidatorRewardClaim>,
@@ -41,17 +45,30 @@ export class Accountant {
 
     private async determineAmount(restriction: TransactionRestriction, senderAddr: string, receiverAddr: string): Promise<Balance> {
         const senderBalance: Balance = await this.client.balanceOf(senderAddr);
-        if (senderBalance.lt(new BN(1) as Balance)) {
+        if (senderBalance.lt(this.minimumSenderBalance)) {
+            // sender doesn't have enough funds
             return new BN(0) as Balance;
         }
-        const receiverBalance: Balance = await this.client.balanceOf(receiverAddr);
 
-        let remaining = restriction.remaining;
+        const receiverBalance: Balance = await this.client.balanceOf(receiverAddr);
+        const remaining = restriction.remaining;
         if (remaining == 0 && restriction.desired != 0) {
             const desired = new BN(restriction.desired);
-            return desired.sub(receiverBalance) as Balance;
-        } else if (remaining < 1) {
-            return new BN(0) as Balance;
+            if (receiverBalance.gte(desired)) {
+                // no need to send anything, receiver already has >= desired
+                return this.zeroBalance;
+            }
+            const ideal = desired.sub(receiverBalance) as Balance;
+            const availableSend = senderBalance.sub(this.minimumSenderBalance) as Balance;
+            if (ideal.gt(availableSend)) {
+                // best effort
+                return availableSend;
+            }
+            //ideal
+            return ideal;
+        }
+        if (remaining < 1) {
+            return this.zeroBalance;
         }
         const remainingBN = new BN(remaining);
 
