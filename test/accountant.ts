@@ -1,10 +1,11 @@
-import { LoggerMock, ClientMock } from './mocks';
-import { Accountant } from '../src/accountant';
-
 import BN from 'bn.js';
 import { should } from 'chai';
 import * as sinon from 'sinon';
 import { Balance } from '@polkadot/types/interfaces';
+
+import { LoggerMock, ClientMock } from './mocks';
+import { Accountant } from '../src/accountant';
+
 
 should();
 
