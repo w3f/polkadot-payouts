@@ -17,4 +17,5 @@ export class ClientMock {
     async claim(keystore: Keystore): Promise<void> {
 
     }
+    teardownApi(): void { }
 }

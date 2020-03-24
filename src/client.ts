@@ -6,6 +6,7 @@ import { waitReady } from '@polkadot/wasm-crypto';
 import fs from 'fs-extra';
 
 import { Logger, Keystore } from './types';
+import { ZeroBalance } from './constants';
 
 export class Client {
     private api: ApiPromise;
@@ -22,6 +23,10 @@ export class Client {
     }
 
     public async send(keystore: Keystore, recipentAddress: string, amount: Balance): Promise<void> {
+        if (amount.lte(ZeroBalance)) {
+            return
+        }
+
         if (!this.api) {
             await this.initApi();
         }
@@ -70,7 +75,7 @@ export class Client {
         this.logger.info(`You are connected to chain ${chain} using ${nodeName} v${nodeVersion}`);
     }
 
-    private teardownApi() {
+    public teardownApi() {
         this.api.disconnect();
     }
 

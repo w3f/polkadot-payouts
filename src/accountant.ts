@@ -42,7 +42,10 @@ export class Accountant {
     }
 
     private async determineAmount(restriction: TransactionRestriction, senderAddr: string, receiverAddr: string): Promise<Balance> {
-        if (restriction.desired != 0 && restriction.remaining != 0) {
+        if (restriction.desired &&
+            restriction.desired != 0 &&
+            restriction.remaining &&
+            restriction.remaining != 0) {
             this.logger.info(`desired (${restriction.desired} and remaining (${restriction.remaining}) specified at the same time, not sending`);
             return ZeroBalance;
         }
@@ -56,7 +59,9 @@ export class Accountant {
         const receiverBalance: Balance = await this.client.balanceOf(receiverAddr);
         const remaining = restriction.remaining;
 
-        if (remaining == 0 && restriction.desired != 0) {
+        if ((remaining === 0 || !remaining) &&
+            restriction.desired &&
+            restriction.desired != 0) {
             const desired = new BN(restriction.desired);
             if (receiverBalance.gte(desired)) {
                 this.logger.info(`no need to send anything, receiver balance ${receiverBalance} >= ${desired}`);

@@ -94,6 +94,14 @@ describe('Accountant', () => {
                     expectedSent: 150
                 });
             });
+            it('should implement remaining with undefined desired', async () => {
+                await checkRestriction({
+                    senderBalance: 250,
+                    remaining: 100,
+                    desired: undefined,
+                    expectedSent: 150
+                });
+            });
             it('should return 0 if sender balance is less than 1', async () => {
                 await checkRestriction({
                     senderBalance: 0.5,
@@ -115,6 +123,15 @@ describe('Accountant', () => {
                     senderBalance: 200,
                     receiverBalance: 50,
                     remaining: 0,
+                    desired: 100,
+                    expectedSent: 50
+                });
+            });
+            it('should implement desired with undefined remaining', async () => {
+                await checkRestriction({
+                    senderBalance: 200,
+                    receiverBalance: 50,
+                    remaining: undefined,
                     desired: 100,
                     expectedSent: 50
                 });
