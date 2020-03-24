@@ -25,13 +25,8 @@ export interface Transaction {
     restriction: TransactionRestriction
 }
 
-export interface ValidatorRewardClaim {
-    keystore: Keystore
-}
-
 export interface InputConfig {
     transactions: Array<Transaction>,
-    validatorRewardClaims: Array<ValidatorRewardClaim>,
     wsEndpoint: string,
     logLevel: string
 }
@@ -43,6 +38,5 @@ export interface Logger {
 export interface Client {
     send: (keystore: Keystore, recipentAddress: string, amount: Balance) => Promise<void>,
     balanceOf: (addr: string) => Promise<Balance>,
-    claim: (keystore: Keystore) => Promise<void>,
-    teardownApi: () => void
+    disconnect: () => void
 }

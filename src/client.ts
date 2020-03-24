@@ -15,7 +15,7 @@ export class Client {
 
     public async balanceOf(addr: string): Promise<Balance> {
         if (!this.api) {
-            await this.initApi();
+            await this.connect();
         }
 
         const account = await this.getAccount(addr);
@@ -28,7 +28,7 @@ export class Client {
         }
 
         if (!this.api) {
-            await this.initApi();
+            await this.connect();
         }
 
         const era = createType(
@@ -59,9 +59,7 @@ export class Client {
         );
     }
 
-    public async claim(keystore: Keystore): Promise<void> { }
-
-    private async initApi() {
+    private async connect() {
         const provider = new WsProvider(this.wsEndpoint);
         this.api = await ApiPromise.create({ provider });
 
@@ -75,7 +73,7 @@ export class Client {
         this.logger.info(`You are connected to chain ${chain} using ${nodeName} v${nodeVersion}`);
     }
 
-    public teardownApi() {
+    public disconnect() {
         this.api.disconnect();
     }
 

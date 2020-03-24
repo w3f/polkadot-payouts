@@ -5,8 +5,7 @@ import {
     Client,
     Logger,
     Transaction,
-    TransactionRestriction,
-    ValidatorRewardClaim
+    TransactionRestriction
 } from './types';
 import { ZeroBalance, MinimumSenderBalance } from './constants';
 
@@ -14,7 +13,6 @@ export class Accountant {
 
     constructor(
         private transactions: Array<Transaction>,
-        private validatorRewardClaims: Array<ValidatorRewardClaim>,
         private client: Client,
         private logger: Logger) { }
 
@@ -24,11 +22,7 @@ export class Accountant {
                 await this.processTx(this.transactions[i]);
             }
         }
-        if (this.validatorRewardClaims.length > 0) {
-            for (let i = 0; i < this.validatorRewardClaims.length; i++) {
-                await this.processValidatorRewardClaim(this.validatorRewardClaims[i]);
-            }
-        }
+        this.client.disconnect();
     }
 
     private async processTx(tx: Transaction) {
@@ -37,16 +31,12 @@ export class Accountant {
         return this.client.send(tx.sender.keystore, tx.receiver.address, amount);
     }
 
-    private async processValidatorRewardClaim(claim: ValidatorRewardClaim) {
-        return this.client.claim(claim.keystore);
-    }
-
     private async determineAmount(restriction: TransactionRestriction, senderAddr: string, receiverAddr: string): Promise<Balance> {
         if (restriction.desired &&
-            restriction.desired != 0 &&
+            restriction.desired >= 0 &&
             restriction.remaining &&
-            restriction.remaining != 0) {
-            this.logger.info(`desired (${restriction.desired} and remaining (${restriction.remaining}) specified at the same time, not sending`);
+            restriction.remaining >= 0) {
+            this.logger.info(`desired (${restriction.desired}) and remaining (${restriction.remaining}) specified at the same time, not sending`);
             return ZeroBalance;
         }
 
