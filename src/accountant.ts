@@ -42,30 +42,37 @@ export class Accountant {
     }
 
     private async determineAmount(restriction: TransactionRestriction, senderAddr: string, receiverAddr: string): Promise<Balance> {
+        if (restriction.desired != 0 && restriction.remaining != 0) {
+            this.logger.info(`desired (${restriction.desired} and remaining (${restriction.remaining}) specified at the same time, not sending`);
+            return ZeroBalance;
+        }
+
         const senderBalance: Balance = await this.client.balanceOf(senderAddr);
         if (senderBalance.lt(MinimumSenderBalance)) {
-            // sender doesn't have enough funds
-            return new BN(0) as Balance;
+            this.logger.info(`sender ${senderAddr} doesn't have enough funds: ${senderBalance}`);
+            return ZeroBalance;
         }
 
         const receiverBalance: Balance = await this.client.balanceOf(receiverAddr);
         const remaining = restriction.remaining;
+
         if (remaining == 0 && restriction.desired != 0) {
             const desired = new BN(restriction.desired);
             if (receiverBalance.gte(desired)) {
-                // no need to send anything, receiver already has >= desired
+                this.logger.info(`no need to send anything, receiver balance ${receiverBalance} >= ${desired}`);
                 return ZeroBalance;
             }
             const ideal = desired.sub(receiverBalance) as Balance;
             const availableSend = senderBalance.sub(MinimumSenderBalance) as Balance;
             if (ideal.gt(availableSend)) {
-                // best effort
+                this.logger.info(`best effort, not enough funds in sender, sending ${availableSend}`);
                 return availableSend;
             }
             //ideal
             return ideal;
         }
         if (remaining < 1) {
+            this.logger.info(`restriction.remaining is <1 (${remaining})`);
             return ZeroBalance;
         }
         const remainingBN = new BN(remaining);

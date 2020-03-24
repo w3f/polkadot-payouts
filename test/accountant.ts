@@ -136,7 +136,15 @@ describe('Accountant', () => {
                     expectedSent: 9
                 });
             });
-            it('should return 0 if both remaining and desired are present');
+            it('should return 0 if both remaining and desired are present', async () => {
+                await checkRestriction({
+                    senderBalance: 1000,
+                    receiverBalance: 50,
+                    remaining: 100,
+                    desired: 100,
+                    expectedSent: 0
+                });
+            });
         });
     });
 });
