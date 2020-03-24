@@ -76,7 +76,7 @@ describe('Accountant', () => {
         });
 
         it('should process all the transactions in the config', async () => {
-            const subject = new Accountant(defaultTransactions(), [], client, logger);
+            const subject = new Accountant(defaultTransactions(), client, logger);
 
             const stub = sandbox.stub(client, 'send');
 
@@ -177,7 +177,7 @@ async function checkRestriction(cfg: checkReceiverInput) {
         desired: cfg.desired,
     };
 
-    const subject = new Accountant(txs, [], client, logger);
+    const subject = new Accountant(txs, client, logger);
 
     const sendStub = sandbox.stub(client, 'send');
     const balanceOfStub = sandbox.stub(client, 'balanceOf');

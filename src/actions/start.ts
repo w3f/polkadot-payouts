@@ -22,7 +22,7 @@ export async function startAction(cmd: any) {
     });
     const client = new Client(cfg.wsEndpoint, logger)
 
-    const accountant = new Accountant(cfg.transactions, cfg.validatorRewardClaims, client, logger);
+    const accountant = new Accountant(cfg.transactions, client, logger);
 
     await accountant.run();
 }
