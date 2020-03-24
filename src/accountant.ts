@@ -1,3 +1,6 @@
+import { Balance } from '@polkadot/types/interfaces';
+import BN from 'bn.js';
+
 import {
     Client,
     Logger,
@@ -5,14 +8,9 @@ import {
     TransactionRestriction,
     ValidatorRewardClaim
 } from './types';
-
-import { Balance } from '@polkadot/types/interfaces';
-import BN from 'bn.js';
-
+import { ZeroBalance, MinimumSenderBalance } from './constants';
 
 export class Accountant {
-    private readonly zeroBalance = new BN(0) as Balance;
-    private readonly minimumSenderBalance = new BN(1) as Balance;
 
     constructor(
         private transactions: Array<Transaction>,
@@ -45,7 +43,7 @@ export class Accountant {
 
     private async determineAmount(restriction: TransactionRestriction, senderAddr: string, receiverAddr: string): Promise<Balance> {
         const senderBalance: Balance = await this.client.balanceOf(senderAddr);
-        if (senderBalance.lt(this.minimumSenderBalance)) {
+        if (senderBalance.lt(MinimumSenderBalance)) {
             // sender doesn't have enough funds
             return new BN(0) as Balance;
         }
@@ -56,10 +54,10 @@ export class Accountant {
             const desired = new BN(restriction.desired);
             if (receiverBalance.gte(desired)) {
                 // no need to send anything, receiver already has >= desired
-                return this.zeroBalance;
+                return ZeroBalance;
             }
             const ideal = desired.sub(receiverBalance) as Balance;
-            const availableSend = senderBalance.sub(this.minimumSenderBalance) as Balance;
+            const availableSend = senderBalance.sub(MinimumSenderBalance) as Balance;
             if (ideal.gt(availableSend)) {
                 // best effort
                 return availableSend;
@@ -68,7 +66,7 @@ export class Accountant {
             return ideal;
         }
         if (remaining < 1) {
-            return this.zeroBalance;
+            return ZeroBalance;
         }
         const remainingBN = new BN(remaining);
 
