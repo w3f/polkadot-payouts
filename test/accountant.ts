@@ -18,13 +18,13 @@ type checkReceiverInput = {
 
 const sandbox = sinon.createSandbox();
 const keystore1 = {
-    fileSecret: "filesecret1",
-    passwordSecret: "filepassword1"
+    filePath: "filesecret1",
+    passwordPath: "filepassword1"
 };
 const receiverAddr1 = "receiverAddr1";
 const keystore2 = {
-    fileSecret: "filesecret2",
-    passwordSecret: "filepassword2"
+    filePath: "filesecret2",
+    passwordPath: "filepassword2"
 };
 const receiverAddr2 = "receiverAddr2";
 const defaultTransactions = () => [

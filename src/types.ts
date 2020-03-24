@@ -1,8 +1,8 @@
 import { Balance } from '@polkadot/types/interfaces';
 
 export interface Keystore {
-    fileSecret: string,
-    passwordSecret: string
+    filePath: string,
+    passwordPath: string
 }
 
 interface TransactionActor {
