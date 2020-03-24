@@ -8,10 +8,11 @@ import fs from 'fs-extra';
 import { Logger, Keystore } from './types';
 import { ZeroBalance } from './constants';
 
+
 export class Client {
     private api: ApiPromise;
 
-    constructor(private wsEndpoint: string, private logger: Logger) { }
+    constructor(private readonly wsEndpoint: string, private readonly logger: Logger) { }
 
     public async balanceOf(addr: string): Promise<Balance> {
         if (!this.api) {
@@ -51,12 +52,15 @@ export class Client {
             era,
             nonce: account.nonce
         };
-
-        await transfer.signAndSend(
-            senderKeyPair,
-            transferOptions,
-            this.sendStatusCb
-        );
+        try {
+            await transfer.signAndSend(
+                senderKeyPair,
+                transferOptions,
+                this.sendStatusCb.bind(this)
+            );
+        } catch (e) {
+            this.logger.info(`Exception during tx sign and send: ${e}`);
+        }
     }
 
     private async connect() {

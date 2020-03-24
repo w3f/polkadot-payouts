@@ -12,9 +12,9 @@ import { ZeroBalance, MinimumSenderBalance } from './constants';
 export class Accountant {
 
     constructor(
-        private transactions: Array<Transaction>,
-        private client: Client,
-        private logger: Logger) { }
+        private readonly transactions: Array<Transaction>,
+        private readonly client: Client,
+        private readonly logger: Logger) { }
 
     async run() {
         if (this.transactions.length > 0) {

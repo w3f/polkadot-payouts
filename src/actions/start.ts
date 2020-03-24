@@ -20,7 +20,7 @@ export async function startAction(cmd: any) {
             new winston.transports.Console()
         ]
     });
-    const client = new Client(cfg.wsEndpoint, logger)
+    const client = new Client(cfg.wsEndpoint, logger);
 
     const accountant = new Accountant(cfg.transactions, client, logger);
 
