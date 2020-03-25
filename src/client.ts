@@ -37,6 +37,7 @@ export class Client {
         const passwordContents = fs.readFileSync(keystore.passwordPath, { encoding: 'utf-8' });
         senderKeyPair.decodePkcs8(passwordContents);
 
+        this.logger.info(`sending ${amount} from ${senderKeyPair.address} to ${recipentAddress}`);
         await this.api.tx.balances
             .transfer(recipentAddress, amount).signAndSend(senderKeyPair);
     }

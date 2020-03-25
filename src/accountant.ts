@@ -19,6 +19,7 @@ export class Accountant {
     async run() {
         if (this.transactions.length > 0) {
             for (let i = 0; i < this.transactions.length; i++) {
+                this.logger.info(`tx ${i} from ${this.transactions[i].sender.alias} to ${this.transactions[i].receiver.alias}`);
                 await this.processTx(this.transactions[i]);
             }
         }
@@ -45,10 +46,15 @@ export class Accountant {
             this.logger.info(`sender ${senderAddr} doesn't have enough funds: ${senderBalance}`);
             return ZeroBalance;
         }
+        const remainingBalance = new BN(restriction.remaining) as Balance;
+        if (senderBalance.lte(remainingBalance)) {
+            this.logger.info(`sender ${senderAddr} doesn't have enough funds to leave ${remainingBalance} after the transaction: ${senderBalance}`);
+            return ZeroBalance;
+        }
 
         const receiverBalance: Balance = await this.client.balanceOf(receiverAddr);
-        const remaining = restriction.remaining;
 
+        const remaining = restriction.remaining;
         if ((remaining === 0 || !remaining) &&
             restriction.desired &&
             restriction.desired != 0) {
@@ -66,7 +72,7 @@ export class Accountant {
             //ideal
             return ideal;
         }
-        const remainingBalance = new BN(remaining) as Balance;
+
         if (remainingBalance.lt(MinimumSenderBalance)) {
             this.logger.info(`restriction.remaining is <1 (${remaining})`);
             return ZeroBalance;

@@ -118,6 +118,14 @@ describe('Accountant', () => {
                     expectedSent: 0
                 });
             });
+            it('should return 0 if sender balance is less than remaining', async () => {
+                await checkRestriction({
+                    senderBalance: 9000000000000,
+                    remaining: 10000000000000,
+                    desired: 0,
+                    expectedSent: 0
+                });
+            });
             it('should implement desired', async () => {
                 await checkRestriction({
                     senderBalance: 200000000000000,
