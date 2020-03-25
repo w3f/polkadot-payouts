@@ -35,6 +35,13 @@ export interface Logger {
     info: (msg: string) => void;
 }
 
+export interface CmdOptions {
+    detached?: boolean,
+    matcher?: RegExp,
+    verbose?: boolean,
+    env?: any
+}
+
 export interface Client {
     send: (keystore: Keystore, recipentAddress: string, amount: Balance) => Promise<void>,
     balanceOf: (addr: string) => Promise<Balance>,
