@@ -54,8 +54,7 @@ export class Accountant {
 
         const receiverBalance: Balance = await this.client.balanceOf(receiverAddr);
 
-        const remaining = restriction.remaining;
-        if ((remaining === 0 || !remaining) &&
+        if (remainingBalance.eq(ZeroBalance) &&
             restriction.desired &&
             restriction.desired != 0) {
             const desired = new BN(restriction.desired);
@@ -74,11 +73,9 @@ export class Accountant {
         }
 
         if (remainingBalance.lt(MinimumSenderBalance)) {
-            this.logger.info(`restriction.remaining is <1 (${remaining})`);
+            this.logger.info(`restriction.remaining is < ${MinimumSenderBalance} (${remainingBalance})`);
             return ZeroBalance;
         }
-        const remainingBN = new BN(remaining);
-
-        return senderBalance.sub(remainingBN) as Balance;
+        return senderBalance.sub(remainingBalance) as Balance;
     }
 }
