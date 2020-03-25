@@ -66,7 +66,8 @@ export class Accountant {
             //ideal
             return ideal;
         }
-        if (remaining < 1) {
+        const remainingBalance = new BN(remaining) as Balance;
+        if (remainingBalance.lt(MinimumSenderBalance)) {
             this.logger.info(`restriction.remaining is <1 (${remaining})`);
             return ZeroBalance;
         }
