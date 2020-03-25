@@ -88,23 +88,23 @@ describe('Accountant', () => {
         describe('restrictions', () => {
             it('should implement remaining', async () => {
                 await checkRestriction({
-                    senderBalance: 250,
-                    remaining: 100,
+                    senderBalance: 250000000000000,
+                    remaining: 100000000000000,
                     desired: 0,
-                    expectedSent: 150
+                    expectedSent: 150000000000000
                 });
             });
             it('should implement remaining with undefined desired', async () => {
                 await checkRestriction({
-                    senderBalance: 250,
-                    remaining: 100,
+                    senderBalance: 250000000000000,
+                    remaining: 100000000000000,
                     desired: undefined,
-                    expectedSent: 150
+                    expectedSent: 150000000000000
                 });
             });
             it('should return 0 if sender balance is less than 1', async () => {
                 await checkRestriction({
-                    senderBalance: 0.5,
+                    senderBalance: 500000000000,
                     remaining: 0,
                     desired: 0,
                     expectedSent: 0
@@ -112,54 +112,54 @@ describe('Accountant', () => {
             });
             it('should return 0 if remaining is less than 1', async () => {
                 await checkRestriction({
-                    senderBalance: 200,
-                    remaining: 0.5,
+                    senderBalance: 200000000000000,
+                    remaining: 500000000000,
                     desired: 0,
                     expectedSent: 0
                 });
             });
             it('should implement desired', async () => {
                 await checkRestriction({
-                    senderBalance: 200,
-                    receiverBalance: 50,
+                    senderBalance: 200000000000000,
+                    receiverBalance: 50000000000000,
                     remaining: 0,
-                    desired: 100,
-                    expectedSent: 50
+                    desired: 100000000000000,
+                    expectedSent: 50000000000000
                 });
             });
             it('should implement desired with undefined remaining', async () => {
                 await checkRestriction({
-                    senderBalance: 200,
-                    receiverBalance: 50,
+                    senderBalance: 200000000000000,
+                    receiverBalance: 50000000000000,
                     remaining: undefined,
-                    desired: 100,
-                    expectedSent: 50
+                    desired: 100000000000000,
+                    expectedSent: 50000000000000
                 });
             });
             it('should return 0 if receiver balance is >= desired', async () => {
                 await checkRestriction({
-                    senderBalance: 200,
-                    receiverBalance: 300,
+                    senderBalance: 200000000000000,
+                    receiverBalance: 300000000000000,
                     remaining: 0,
-                    desired: 100,
+                    desired: 100000000000000,
                     expectedSent: 0
                 });
             });
             it('should send desired on best effort', async () => {
                 await checkRestriction({
-                    senderBalance: 10,
-                    receiverBalance: 50,
+                    senderBalance: 10000000000000,
+                    receiverBalance: 50000000000000,
                     remaining: 0,
-                    desired: 100,
-                    expectedSent: 9
+                    desired: 100000000000000,
+                    expectedSent: 9000000000000
                 });
             });
             it('should return 0 if both remaining and desired are present', async () => {
                 await checkRestriction({
-                    senderBalance: 1000,
-                    receiverBalance: 50,
-                    remaining: 100,
-                    desired: 100,
+                    senderBalance: 1000000000000000,
+                    receiverBalance: 50000000000000,
+                    remaining: 100000000000000,
+                    desired: 100000000000000,
                     expectedSent: 0
                 });
             });
