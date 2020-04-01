@@ -89,7 +89,9 @@ export class Client {
     }
 
     public disconnect() {
-        this.api.disconnect();
+        if (this.api) {
+            this.api.disconnect();
+        }
     }
 
     private async getAccount(addr: string) {
