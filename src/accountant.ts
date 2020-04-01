@@ -27,6 +27,15 @@ export class Accountant {
     }
 
     private async processTx(tx: Transaction) {
+        if (tx.sender.address === '') {
+            this.logger.info(`Empty sender address for '${tx.sender.alias}', not sending.`);
+            return
+        }
+        if (tx.receiver.address === '') {
+            this.logger.info(`Empty receiver address for '${tx.receiver.alias}', not sending.`);
+            return
+        }
+
         const amount = await this.determineAmount(tx.restriction, tx.sender.address, tx.receiver.address);
 
         return this.client.send(tx.sender.keystore, tx.receiver.address, amount);

@@ -172,6 +172,38 @@ describe('Accountant', () => {
                 });
             });
         });
+        describe('empty actors', () => {
+            it('should not try to send when sender is empty', async () => {
+                const txs = defaultTransactions();
+
+                txs.pop();
+
+                txs[0].sender.address = '';
+
+                const subject = new Accountant(txs, client, logger);
+
+                const stub = sandbox.stub(client, 'send');
+
+                await subject.run();
+
+                stub.notCalled.should.be.true;
+            });
+            it('should not try to send when receciver is empty', async () => {
+                const txs = defaultTransactions();
+
+                txs.pop();
+
+                txs[0].receiver.address = '';
+
+                const subject = new Accountant(txs, client, logger);
+
+                const stub = sandbox.stub(client, 'send');
+
+                await subject.run();
+
+                stub.notCalled.should.be.true;
+            });
+        });
     });
 });
 
