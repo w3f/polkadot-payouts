@@ -25,6 +25,15 @@ export class Client {
         return account.data.free;
     }
 
+    public async balanceOfKeystore(keystore: Keystore): Promise<Balance> {
+        if (!this.api) {
+            await this.connect();
+        }
+        const keyContents = this.keystoreContent(keystore.filePath);
+
+        return this.balanceOf(keyContents.address);
+    }
+
     public async send(keystore: Keystore, recipentAddress: string, amount: Balance): Promise<void> {
         if (amount.lte(ZeroBalance)) {
             return
@@ -40,7 +49,7 @@ export class Client {
             new GenericImmortalEra(this.api.registry)
         );
 
-        const keyContents = JSON.parse(fs.readFileSync(keystore.filePath, { encoding: 'utf-8' }));
+        const keyContents = this.keystoreContent(keystore.filePath);
         const keyType = keyContents.encoding.content[1];
         const keyring = new Keyring({ type: keyType });
         const senderKeyPair = keyring.addFromJson(keyContents);
@@ -123,5 +132,8 @@ export class Client {
                 );
                 this.currentTxDone = true;
         }
+    }
+    private keystoreContent(path: string) {
+        return JSON.parse(fs.readFileSync(path, { encoding: 'utf-8' }));
     }
 }

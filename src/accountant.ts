@@ -4,6 +4,7 @@ import BN from 'bn.js';
 import {
     Client,
     Logger,
+    Keystore,
     Transaction,
     TransactionRestriction
 } from './types';
@@ -27,21 +28,17 @@ export class Accountant {
     }
 
     private async processTx(tx: Transaction) {
-        if (!tx.sender.address) {
-            this.logger.info(`Empty sender address for '${tx.sender.alias}', not sending.`);
-            return
-        }
         if (!tx.receiver.address) {
             this.logger.info(`Empty receiver address for '${tx.receiver.alias}', not sending.`);
             return
         }
 
-        const amount = await this.determineAmount(tx.restriction, tx.sender.address, tx.receiver.address);
+        const amount = await this.determineAmount(tx.restriction, tx.sender.keystore, tx.receiver.address);
 
         return this.client.send(tx.sender.keystore, tx.receiver.address, amount);
     }
 
-    private async determineAmount(restriction: TransactionRestriction, senderAddr: string, receiverAddr: string): Promise<Balance> {
+    private async determineAmount(restriction: TransactionRestriction, senderKeystore: Keystore, receiverAddr: string): Promise<Balance> {
         if (restriction.desired &&
             restriction.desired >= 0 &&
             restriction.remaining &&
@@ -50,14 +47,14 @@ export class Accountant {
             return ZeroBalance;
         }
 
-        const senderBalance: Balance = await this.client.balanceOf(senderAddr);
+        const senderBalance: Balance = await this.client.balanceOfKeystore(senderKeystore);
         if (senderBalance.lt(MinimumSenderBalance)) {
-            this.logger.info(`sender ${senderAddr} doesn't have enough funds: ${senderBalance}`);
+            this.logger.info(`sender doesn't have enough funds: ${senderBalance}`);
             return ZeroBalance;
         }
         const remainingBalance = new BN(restriction.remaining) as Balance;
         if (senderBalance.lte(remainingBalance)) {
-            this.logger.info(`sender ${senderAddr} doesn't have enough funds to leave ${remainingBalance} after the transaction: ${senderBalance}`);
+            this.logger.info(`sender doesn't have enough funds to leave ${remainingBalance} after the transaction: ${senderBalance}`);
             return ZeroBalance;
         }
 

@@ -1,6 +1,8 @@
 import BN from 'bn.js';
 import { should } from 'chai';
+import fs from 'fs-extra';
 import * as sinon from 'sinon';
+import tmp from 'tmp';
 import { Balance } from '@polkadot/types/interfaces';
 
 import { LoggerMock, ClientMock } from './mocks';
@@ -18,13 +20,19 @@ type checkReceiverInput = {
 }
 
 const sandbox = sinon.createSandbox();
+const keystore1Content = '{"address": "sender1_addr","encoding":{"content":["", "s325519"]}}'
+const tmpobj1 = tmp.fileSync();
+fs.writeSync(tmpobj1.fd, keystore1Content);
 const keystore1 = {
-    filePath: "filesecret1",
+    filePath: tmpobj1.name,
     passwordPath: "filepassword1"
 };
 const receiverAddr1 = "receiverAddr1";
+const keystore2Content = '{"address": "sender2_addr","encoding":{"content":["", "s325519"]}}'
+const tmpobj2 = tmp.fileSync();
+fs.writeSync(tmpobj2.fd, keystore2Content);
 const keystore2 = {
-    filePath: "filesecret2",
+    filePath: tmpobj2.name,
     passwordPath: "filepassword2"
 };
 const receiverAddr2 = "receiverAddr2";
@@ -33,7 +41,6 @@ const defaultTransactions = () => [
         sender: {
             keystore: keystore1,
             alias: "sender1",
-            address: "sender1_addr"
         },
         receiver: {
             alias: "receiver1",
@@ -48,7 +55,6 @@ const defaultTransactions = () => [
         sender: {
             keystore: keystore2,
             alias: "sender2",
-            address: "sender2_addr"
         },
         receiver: {
             alias: "receiver2",
@@ -173,22 +179,7 @@ describe('Accountant', () => {
             });
         });
         describe('empty actors', () => {
-            it('should not try to send when sender is empty', async () => {
-                const txs = defaultTransactions();
-
-                txs.pop();
-
-                delete txs[0].sender.address;
-
-                const subject = new Accountant(txs, client, logger);
-
-                const stub = sandbox.stub(client, 'send');
-
-                await subject.run();
-
-                stub.notCalled.should.be.true;
-            });
-            it('should not try to send when receciver is empty', async () => {
+            it('should not try to send when receciver address is empty', async () => {
                 const txs = defaultTransactions();
 
                 txs.pop();
@@ -202,6 +193,39 @@ describe('Accountant', () => {
                 await subject.run();
 
                 stub.notCalled.should.be.true;
+            });
+            it('should get the sender address from the keystore', async () => {
+                const senderAddress = 'sender-address-from-keystore';
+                const receiverAddress = 'receciver-address-not-from-keystore';
+
+                const fileContent = `{"address":"${senderAddress}","encoded":"encoded-content","encoding":{"content":["pkcs8","ed25519"],"type":"xsalsa20-poly1305","version":"2"},"meta":{}}`;
+
+                const tmpobj = tmp.fileSync();
+                fs.writeSync(tmpobj.fd, fileContent);
+
+                const txs = defaultTransactions();
+
+                txs.pop();
+
+                txs[0].sender.keystore = {
+                    filePath: tmpobj.name,
+                    passwordPath: 'passwordpath'
+                };
+                txs[0].receiver.address = receiverAddress;
+
+                sandbox.stub(client, 'send');
+                const balanceOfStub = sandbox.stub(client, 'balanceOf');
+                const balanceOfKeystoreStub = sandbox.stub(client, 'balanceOfKeystore');
+
+                const senderBalance = new BN(100) as Balance;
+                const receiverBalance = new BN(100) as Balance;
+                balanceOfKeystoreStub.onFirstCall().resolves(senderBalance);
+                balanceOfStub.onFirstCall().resolves(receiverBalance);
+
+                const subject = new Accountant(txs, client, logger);
+                await subject.run();
+
+                balanceOfKeystoreStub.calledWith(txs[0].sender.keystore).should.be.true;
             });
         });
     });
@@ -220,12 +244,13 @@ async function checkRestriction(cfg: checkReceiverInput) {
     const subject = new Accountant(txs, client, logger);
 
     const sendStub = sandbox.stub(client, 'send');
+    const balanceOfKeystoreStub = sandbox.stub(client, 'balanceOfKeystore');
     const balanceOfStub = sandbox.stub(client, 'balanceOf');
 
     const senderBalance = new BN(cfg.senderBalance) as Balance;
     const receiverBalance = new BN(cfg.receiverBalance) as Balance;
-    balanceOfStub.onFirstCall().resolves(senderBalance);
-    balanceOfStub.onSecondCall().resolves(receiverBalance);
+    balanceOfKeystoreStub.onFirstCall().resolves(senderBalance);
+    balanceOfStub.onFirstCall().resolves(receiverBalance);
 
     await subject.run();
 

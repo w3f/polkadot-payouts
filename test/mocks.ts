@@ -14,5 +14,8 @@ export class ClientMock {
     async balanceOf(addr: string): Promise<Balance> {
         return new BN(10) as Balance;
     }
+    async balanceOfKeystore(keystore: Keystore): Promise<Balance> {
+        return new BN(10) as Balance;
+    }
     disconnect(): void { }
 }
