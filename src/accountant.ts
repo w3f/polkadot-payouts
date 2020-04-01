@@ -27,11 +27,11 @@ export class Accountant {
     }
 
     private async processTx(tx: Transaction) {
-        if (tx.sender.address === '') {
+        if (!tx.sender.address) {
             this.logger.info(`Empty sender address for '${tx.sender.alias}', not sending.`);
             return
         }
-        if (tx.receiver.address === '') {
+        if (!tx.receiver.address) {
             this.logger.info(`Empty receiver address for '${tx.receiver.alias}', not sending.`);
             return
         }

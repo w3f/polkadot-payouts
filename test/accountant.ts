@@ -178,7 +178,7 @@ describe('Accountant', () => {
 
                 txs.pop();
 
-                txs[0].sender.address = '';
+                delete txs[0].sender.address;
 
                 const subject = new Accountant(txs, client, logger);
 
@@ -193,7 +193,7 @@ describe('Accountant', () => {
 
                 txs.pop();
 
-                txs[0].receiver.address = '';
+                delete txs[0].receiver.address;
 
                 const subject = new Accountant(txs, client, logger);
 
