@@ -40,9 +40,10 @@ export class Client {
             new GenericImmortalEra(this.api.registry)
         );
 
-        const keyring = new Keyring({ type: 'sr25519' });
-        const keyContents = fs.readFileSync(keystore.filePath, { encoding: 'utf-8' });
-        const senderKeyPair = keyring.addFromJson(JSON.parse(keyContents));
+        const keyContents = JSON.parse(fs.readFileSync(keystore.filePath, { encoding: 'utf-8' }));
+        const keyType = keyContents.encoding.content[1];
+        const keyring = new Keyring({ type: keyType });
+        const senderKeyPair = keyring.addFromJson(keyContents);
         const passwordContents = fs.readFileSync(keystore.passwordPath, { encoding: 'utf-8' });
         senderKeyPair.decodePkcs8(passwordContents);
 
