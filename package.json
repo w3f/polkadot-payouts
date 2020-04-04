@@ -1,8 +1,8 @@
 {
-  "name": "watchtower",
+  "name": "accountant",
   "version": "0.1.0",
-  "description": "Deliver information about Polkadot networks",
-  "repository": "git@github.com:w3f/watchtower.git",
+  "description": "Automated transfers among accounts",
+  "repository": "git@github.com:w3f/accountant.git",
   "author": "Federico Gimenez <federico@web3.foundation>",
   "license": "MIT",
   "scripts": {
