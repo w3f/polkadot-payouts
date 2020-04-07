@@ -10,7 +10,7 @@ export async function startAction(cmd: any) {
 
     const logger = createLogger(cfg.logLevel);
 
-    const client = new Client(cfg.wsEndpoint);
+    const client = new Client(cfg.wsEndpoint, logger);
 
     const accountant = new Accountant(cfg.transactions, client, logger);
 
