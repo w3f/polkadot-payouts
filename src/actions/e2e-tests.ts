@@ -1,6 +1,6 @@
 import { Cmd } from '../cmd';
 import { Config } from '../config';
-import { createLogger } from '../logger';
+import { createLogger } from '@w3f/logger';
 import { E2ETests } from '../../e2e-tests';
 
 

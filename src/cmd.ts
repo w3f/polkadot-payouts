@@ -1,6 +1,8 @@
 import { Buffer } from 'buffer';
 import { spawn } from 'child_process';
-import { CmdOptions, Logger } from './types';
+import { Logger } from '@w3f/logger';
+
+import { CmdOptions } from './types';
 
 export class Cmd {
     constructor(private logger: Logger) { }
