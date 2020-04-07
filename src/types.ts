@@ -34,10 +34,6 @@ export interface InputConfig {
     logLevel: string
 }
 
-export interface Logger {
-    info: (msg: string) => void;
-}
-
 export interface CmdOptions {
     detached?: boolean,
     matcher?: RegExp,

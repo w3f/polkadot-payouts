@@ -60,7 +60,7 @@
     eventemitter3 "^4.0.0"
     rxjs "^6.5.4"
 
-"@polkadot/keyring@^2.7.1":
+"@polkadot/keyring@2.7.1", "@polkadot/keyring@^2.7.1":
   version "2.7.1"
   resolved "https://registry.yarnpkg.com/@polkadot/keyring/-/keyring-2.7.1.tgz#714d564b80305a343d83ff07baae59173af5f463"
   integrity sha512-aQkc6TT0kaLwEa7rxit/M6/uWJ03wWY1owZychW9slfXH/tmWMCSM0m6z78MIAzdnSTVY7ztpjDfxrPOCHlLYA==
@@ -308,6 +308,13 @@
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@types/tmp/-/tmp-0.1.0.tgz#19cf73a7bcf641965485119726397a096f0049bd"
   integrity sha512-6IwZ9HzWbCq6XoQWhxLpDjuADodH/MKXRUIDFudvgjcVdjFknvmR+DNsoUeer4XPrEnrZs04Jj+kfV9pFsrhmA==
+
+"@w3f/logger@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@w3f/logger/-/logger-0.2.0.tgz#979eae4616bae453dae55a09dee47b4ef438ee19"
+  integrity sha512-aMdDAQa6qkb/BRKJnjUhE/G9EAYDtkrazXi/UHLPmPGwtwSKMwonvsVhJACTBr7VNbRbf88ZD2HWV88OOt1q6g==
+  dependencies:
+    winston "^3.2.1"
 
 acorn-jsx@^5.1.0:
   version "5.2.0"

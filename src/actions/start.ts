@@ -1,7 +1,7 @@
 import { Accountant } from '../accountant';
 import { Client } from '../client';
 import { Config } from '../config';
-import { createLogger } from '../logger';
+import { createLogger } from '@w3f/logger';
 
 
 export async function startAction(cmd: any) {

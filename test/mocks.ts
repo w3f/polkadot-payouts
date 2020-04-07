@@ -6,6 +6,8 @@ import { Keystore } from '../src/types';
 export class LoggerMock {
     info(msg: string) {
     }
+    debug(msg: string) {
+    }
 }
 
 export class ClientMock {
