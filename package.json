@@ -5,11 +5,14 @@
   "repository": "git@github.com:w3f/accountant.git",
   "author": "Federico Gimenez <federico@web3.foundation>",
   "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "lint": "tslint -p tsconfig.json",
+    "lint": "yarn eslint . --ext .js,.jsx,.ts,.tsx",
     "build": "tsc --build tsconfig.json",
-    "test": "mocha --timeout 10000 --require ts-node/register --exit test/**/*.ts",
-    "start": "node ./dist/src/index.js start"
+    "pretest": "yarn lint",
+    "test": "mocha --timeout 30000 --require ts-node/register --exit test/**/*.ts",
+    "start": "node ./dist/index.js start"
   },
   "dependencies": {
     "@polkadot/api": "1.9.1",

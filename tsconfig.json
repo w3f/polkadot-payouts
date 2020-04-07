@@ -9,8 +9,10 @@
     "esModuleInterop": true
   },
   "exclude": [
-      "node_modules",
-      "**/*.spec.ts"
+    "node_modules",
+    "**/*.spec.ts",
+    "test/**/*",
+    "dist/**/*"
   ],
   "_comment": "The accountant app contains typescript errors"
 }
