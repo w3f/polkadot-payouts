@@ -5,7 +5,7 @@ import { Accountant } from '../accountant';
 import { Config } from '../config';
 
 
-export async function startAction(cmd: any) {
+export async function startAction(cmd: any): Promise<void> {
     const cfg = Config.parse(cmd.config);
 
     const logger = createLogger(cfg.logLevel);

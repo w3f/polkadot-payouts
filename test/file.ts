@@ -27,7 +27,7 @@ describe('YAML file reader', () => {
         const tmpobj = tmp.fileSync();
         fs.writeSync(tmpobj.fd, fileContent);
 
-        (() => { Files.readYAML(tmpobj.name) }).should.throw();
+        ((): void => { Files.readYAML(tmpobj.name) }).should.throw();
     });
 
 });

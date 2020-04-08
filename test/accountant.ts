@@ -7,16 +7,16 @@ import { Balance } from '@polkadot/types/interfaces';
 
 import { LoggerMock, ClientMock } from './mocks';
 import { Accountant } from '../src/accountant';
-
+import { Transaction } from '../src/types';
 
 should();
 
 type checkReceiverInput = {
-    senderBalance?: number,
-    receiverBalance?: number,
-    remaining?: number,
-    desired?: number,
-    expectedSent?: number
+    senderBalance?: number;
+    receiverBalance?: number;
+    remaining?: number;
+    desired?: number;
+    expectedSent?: number;
 }
 
 const sandbox = sinon.createSandbox();
@@ -36,7 +36,7 @@ const keystore2 = {
     passwordPath: "filepassword2"
 };
 const receiverAddr2 = "receiverAddr2";
-const defaultTransactions = () => [
+const defaultTransactions = (): Transaction[] => [
     {
         sender: {
             keystore: keystore1,
@@ -69,6 +69,33 @@ const defaultTransactions = () => [
 
 let logger: LoggerMock;
 let client: ClientMock;
+
+async function checkRestriction(cfg: checkReceiverInput): Promise<void> {
+    const txs = defaultTransactions();
+
+    txs.pop();
+
+    txs[0].restriction = {
+        remaining: cfg.remaining,
+        desired: cfg.desired,
+    };
+
+    const subject = new Accountant(txs, client, logger);
+
+    const sendStub = sandbox.stub(client, 'send');
+    const balanceOfKeystoreStub = sandbox.stub(client, 'balanceOfKeystore');
+    const balanceOfStub = sandbox.stub(client, 'balanceOf');
+
+    const senderBalance = new BN(cfg.senderBalance) as Balance;
+    const receiverBalance = new BN(cfg.receiverBalance) as Balance;
+    balanceOfKeystoreStub.onFirstCall().resolves(senderBalance);
+    balanceOfStub.onFirstCall().resolves(receiverBalance);
+
+    await subject.run();
+
+    const expectedSent = new BN(cfg.expectedSent) as Balance;
+    sendStub.calledWith(keystore1, receiverAddr1, expectedSent).should.be.true;
+}
 
 describe('Accountant', () => {
     beforeEach(() => {
@@ -230,30 +257,3 @@ describe('Accountant', () => {
         });
     });
 });
-
-async function checkRestriction(cfg: checkReceiverInput) {
-    const txs = defaultTransactions();
-
-    txs.pop();
-
-    txs[0].restriction = {
-        remaining: cfg.remaining,
-        desired: cfg.desired,
-    };
-
-    const subject = new Accountant(txs, client, logger);
-
-    const sendStub = sandbox.stub(client, 'send');
-    const balanceOfKeystoreStub = sandbox.stub(client, 'balanceOfKeystore');
-    const balanceOfStub = sandbox.stub(client, 'balanceOf');
-
-    const senderBalance = new BN(cfg.senderBalance) as Balance;
-    const receiverBalance = new BN(cfg.receiverBalance) as Balance;
-    balanceOfKeystoreStub.onFirstCall().resolves(senderBalance);
-    balanceOfStub.onFirstCall().resolves(receiverBalance);
-
-    await subject.run();
-
-    const expectedSent = new BN(cfg.expectedSent) as Balance;
-    sendStub.calledWith(keystore1, receiverAddr1, expectedSent).should.be.true;
-}

@@ -4,9 +4,9 @@ import BN from 'bn.js';
 import { Keystore } from '../src/types';
 
 export class LoggerMock {
-    info(msg: string) {
+    info(msg: string): void {
     }
-    debug(msg: string) {
+    debug(msg: string): void {
     }
 }
 

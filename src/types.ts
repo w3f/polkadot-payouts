@@ -1,49 +1,49 @@
 import { Balance } from '@polkadot/types/interfaces';
 
 export interface Keystore {
-    filePath: string,
-    passwordPath: string
+    filePath: string;
+    passwordPath: string;
 }
 
 interface TransactionActor {
-    alias: string,
+    alias: string;
 }
 
 interface TransactionSender extends TransactionActor {
-    keystore: Keystore
+    keystore: Keystore;
 }
 
 interface TransactionReceiver extends TransactionActor {
-    address: string
+    address: string;
 }
 
 export type TransactionRestriction = {
-    remaining: number,
-    desired: number
+    remaining: number;
+    desired: number;
 }
 
 export interface Transaction {
-    sender: TransactionSender,
-    receiver: TransactionReceiver,
-    restriction: TransactionRestriction
+    sender: TransactionSender;
+    receiver: TransactionReceiver;
+    restriction: TransactionRestriction;
 }
 
 export interface InputConfig {
-    transactions: Array<Transaction>,
-    wsEndpoint: string,
-    logLevel: string
+    transactions: Array<Transaction>;
+    wsEndpoint: string;
+    logLevel: string;
 }
 
 export interface CmdOptions {
-    detached?: boolean,
-    matcher?: RegExp,
-    verbose?: boolean,
-    env?: any
+    detached?: boolean;
+    matcher?: RegExp;
+    verbose?: boolean;
+    env?: any;
 }
 
 export interface Client {
-    send: (keystore: Keystore, recipentAddress: string, amount: Balance) => Promise<void>,
-    balanceOf: (addr: string) => Promise<Balance>,
-    balanceOfKeystore: (keystore: Keystore) => Promise<Balance>,
-    disconnect: () => void
+    send: (keystore: Keystore, recipentAddress: string, amount: Balance) => Promise<void>;
+    balanceOf: (addr: string) => Promise<Balance>;
+    balanceOfKeystore: (keystore: Keystore) => Promise<Balance>;
+    disconnect: () => void;
 }

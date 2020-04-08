@@ -17,7 +17,7 @@ export class Accountant {
         private readonly client: Client,
         private readonly logger: Logger) { }
 
-    async run() {
+    async run(): Promise<void> {
         if (this.transactions.length > 0) {
             for (let i = 0; i < this.transactions.length; i++) {
                 this.logger.info(`tx ${i} from ${this.transactions[i].sender.alias} to ${this.transactions[i].receiver.alias}`);
@@ -27,7 +27,7 @@ export class Accountant {
         this.client.disconnect();
     }
 
-    private async processTx(tx: Transaction) {
+    private async processTx(tx: Transaction): Promise<void> {
         if (!tx.receiver.address) {
             this.logger.info(`Empty receiver address for '${tx.receiver.alias}', not sending.`);
             return
