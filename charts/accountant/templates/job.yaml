@@ -14,11 +14,21 @@ spec:
           - name: {{ .Release.Name }}
             image: {{ .Values.image.repo }}:{{ .Values.image.tag }}
             volumeMounts:
-            {{ range .Values.transactions }}
-            - name:
-              valueFrom:
-                secretKeyRef:
-                  name: {{ . }}
-                  key:
-            {{ end }}
+            {{- range .Values.secrets.items }}
+            - name: {{ .name }}
+              mountPath: /etc/accountant/{{ .name }}
+            {{- end }}
+            - name: config
+              mountPath: /app/config
           restartPolicy: Never
+          volumes:
+          - name: config
+            configMap:
+              name: {{ .Release.Name }}
+          {{ range .Values.secrets.items }}
+          - name: {{ .name }}
+            secret:
+              secretName: {{ .name }}
+              items:
+{{ toYaml .content | indent 14 }}
+          {{- end }}

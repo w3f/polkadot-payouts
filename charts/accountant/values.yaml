@@ -10,6 +10,21 @@ namespace:
   create: true
   name: accountant
 
+secrets:
+  path: /etc/accountant
+  items:
+  - name: sender1
+    content:
+    - key: stashContent
+      path: stashContent
+    - key: password
+      path: password
+  - name: sender2
+    content:
+    - key: stashContent
+      path: stashContent
+    - key: password
+      path: password
 
 applicationConfig:
   logLevel: info
@@ -20,8 +35,8 @@ applicationConfig:
         alias: sender1
         address: sender1
         keystore:
-          fileSecret: senderFile1
-          passwordSecret: senderPassword1
+          filePath: /etc/accountant/sender1/stashContent
+          passwordPath: /etc/accountant/sender1/password
       receiver:
         alias: receiver1
         address: receiver1
@@ -31,17 +46,10 @@ applicationConfig:
         alias: sender2
         account: sender2
         keystore:
-          fileSecret: senderFile2
-          passwordSecret: senderSecret2
+          filePath: /etc/accountant/sender2/stashContent
+          passwordPath: /etc/accountant/sender2/password
       receiver:
         alias: receiver2
         account: receiver2
       restriction:
         desired: 10 # send desired - current_receiver_balance, if current_receiver_balance >= desired noop
-    validatorRewardClaims:
-    - keystore:
-        fileSecret: claimFile1
-        passwordSecret: claimPassword1
-    - keystore:
-        fileSecret: claimFile2
-        passwordSecret: claimPassword2
