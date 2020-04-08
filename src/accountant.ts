@@ -1,14 +1,17 @@
 import { Balance } from '@polkadot/types/interfaces';
 import BN from 'bn.js';
 import { Logger } from '@w3f/logger';
-
 import {
     Client,
     Keystore,
+    ZeroBalance,
+    MinimumSenderBalance
+} from '@w3f/polkadot-api-client';
+
+import {
     Transaction,
     TransactionRestriction
 } from './types';
-import { ZeroBalance, MinimumSenderBalance } from './constants';
 
 export class Accountant {
 
