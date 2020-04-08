@@ -15,8 +15,8 @@ transactions:
     alias: sender1
     address: sender1
     keystore:
-      fileSecret: senderFile1
-      passwordSecret: senderPassword1
+      filePath: senderFile1
+      passwordPath: senderPassword1
   receiver:
     alias: receiver1
     address: receiver1
