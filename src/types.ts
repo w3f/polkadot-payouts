@@ -40,10 +40,3 @@ export interface CmdOptions {
     verbose?: boolean;
     env?: any;
 }
-
-export interface Client {
-    send: (keystore: Keystore, recipentAddress: string, amount: Balance) => Promise<void>;
-    balanceOf: (addr: string) => Promise<Balance>;
-    balanceOfKeystore: (keystore: Keystore) => Promise<Balance>;
-    disconnect: () => void;
-}
