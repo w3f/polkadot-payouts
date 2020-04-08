@@ -2,7 +2,7 @@ import { Balance } from '@polkadot/types/interfaces';
 import BN from 'bn.js';
 import { Logger } from '@w3f/logger';
 import {
-    Client,
+    ApiClient,
     Keystore,
     ZeroBalance,
     MinimumSenderBalance
@@ -17,7 +17,7 @@ export class Accountant {
 
     constructor(
         private readonly transactions: Array<Transaction>,
-        private readonly client: Client,
+        private readonly client: ApiClient,
         private readonly logger: Logger) { }
 
     async run(): Promise<void> {
