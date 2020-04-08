@@ -24,7 +24,7 @@ jobs:
       - run:
           name: Run e2e tests
           command: |
-            yarn test
+            yarn e2e-test
 
   buildImage:
     docker:
