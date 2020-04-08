@@ -428,10 +428,10 @@
     fs-extra "^9.0.0"
     ws "6.1.2"
 
-"@w3f/test-utils@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@w3f/test-utils/-/test-utils-0.2.1.tgz#53bd4b0a4a04b7224741e7c793e4da026dd30831"
-  integrity sha512-t0tY3qUPHyokAVS0BxtXtt/ZJJfFJfTltj/hUSLZh8JGXIcysGh/TqxMUh6ARJg4Z28dWgG8tt6MdxfDmS63wQ==
+"@w3f/test-utils@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@w3f/test-utils/-/test-utils-0.2.2.tgz#d16f29a3628f3ffec8b3fb949aef0ebd7681c150"
+  integrity sha512-aEvowLCgovElMwsrzLJ9kij1WcGGE+Mn41AtRHiwlNtC8l8t3wAsQwE96qwxQ5e84cewrZ5z48OMpnty49wjTA==
   dependencies:
     "@polkadot/api" "^1.9.1"
     "@polkadot/wasm-crypto" "^1.2.1"
