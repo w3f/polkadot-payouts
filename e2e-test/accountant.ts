@@ -26,36 +26,32 @@ describe('E2E', () => {
         await testRPC.stop();
     });
 
-    it('should send the transactions with remaining restriction', async () => {
-        const restriction = new BN('5000000000000');
-        const restrictionString = `remaining: ${restriction}`;
+    it('should send the transactions with remaining and desired restrictions', async () => {
+        const alice = keyring.addFromUri('//Alice');
+        const bob = keyring.addFromUri('//Bob');
+        const charlie = keyring.addFromUri('//Charlie');
+        const ferdie = keyring.addFromUri('//Ferdie');
 
-        await checkAccountant(restriction, restrictionString);
-    });
+        const pass = 'pass';
+        const passFile = tmp.fileSync();
+        fs.writeSync(passFile.fd, pass);
 
-    it('should send the transactions with desired restriction', async () => {
-        const restriction = new BN('1500000000000000000');
-        const restrictionString = `desired: ${restriction}`;
+        const aliceKeypairJson = keyring.toJson(alice.address, pass);
+        const aliceKsFile = tmp.fileSync();
+        fs.writeSync(aliceKsFile.fd, JSON.stringify(aliceKeypairJson));
 
-        await checkAccountant(restriction, restrictionString);
-    });
-});
+        const charlieKeypairJson = keyring.toJson(charlie.address, pass);
+        const charlieKsFile = tmp.fileSync();
+        fs.writeSync(charlieKsFile.fd, JSON.stringify(charlieKeypairJson));
 
-async function checkAccountant(restriction: BN, restrictionString: string): Promise<void> {
-    const alice = keyring.addFromUri('//Alice');
-    const bob = keyring.addFromUri('//Bob');
+        const aliceInitBalance = await client.balanceOf(alice.address);
+        const bobInitBalance = await client.balanceOf(bob.address);
+        const charlieInitBalance = await client.balanceOf(charlie.address);
+        const ferdieInitBalance = await client.balanceOf(ferdie.address);
 
-    const pass = 'pass';
-    const aliceKeypairJson = keyring.toJson(alice.address, pass);
-    const ksFile = tmp.fileSync();
-    fs.writeSync(ksFile.fd, JSON.stringify(aliceKeypairJson));
-    const passFile = tmp.fileSync();
-    fs.writeSync(passFile.fd, pass);
-
-    const aliceInitBalance = await client.balanceOf(alice.address);
-    const bobInitBalance = await client.balanceOf(bob.address);
-
-    const cfgContent = `
+        const remaining = new BN("5000000000000");
+        const desired = new BN("1500000000000000000");
+        const cfgContent = `
 logLevel: info
 wsEndpoint: ${testRPC.endpoint()}
 transactions:
@@ -63,23 +59,38 @@ transactions:
     alias: alice
     address: ${alice.address}
     keystore:
-      filePath: ${ksFile.name}
+      filePath: ${aliceKsFile.name}
       passwordPath: ${passFile.name}
   receiver:
     alias: bob
     address: ${bob.address}
   restriction:
-    ${restrictionString}
+    remaining: "${remaining}"
+- sender:
+    alias: charlie
+    address: ${charlie.address}
+    keystore:
+      filePath: ${charlieKsFile.name}
+      passwordPath: ${passFile.name}
+  receiver:
+    alias: ferdie
+    address: ${ferdie.address}
+  restriction:
+    desired: "${desired}"
 `;
-    const cfgFile = tmp.fileSync();
-    fs.writeSync(cfgFile.fd, cfgContent);
+        const cfgFile = tmp.fileSync();
+        fs.writeSync(cfgFile.fd, cfgContent);
 
-    await startAction({ config: cfgFile.name });
+        await startAction({ config: cfgFile.name });
 
-    const bobFinalBalance = await client.balanceOf(bob.address);
+        const bobFinalBalance = await client.balanceOf(bob.address);
 
-    const expectedSend = aliceInitBalance.sub(new BN(restriction) as Balance);
-    const expected = bobInitBalance.add(expectedSend);
+        const expectedOneSend = aliceInitBalance.sub(new BN(remaining) as Balance);
+        const expectedOne = bobInitBalance.add(expectedOneSend);
 
-    bobFinalBalance.eq(expected).should.be.true;
-}
+        bobFinalBalance.eq(expectedOne).should.be.true;
+
+        const ferdieFinalBalance = await client.balanceOf(ferdie.address);
+        ferdieFinalBalance.eq(desired).should.be.true;
+    });
+});
