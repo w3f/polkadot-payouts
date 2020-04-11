@@ -46,8 +46,6 @@ describe('E2E', () => {
 
         const aliceInitBalance = await client.balanceOf(alice.address);
         const bobInitBalance = await client.balanceOf(bob.address);
-        const charlieInitBalance = await client.balanceOf(charlie.address);
-        const ferdieInitBalance = await client.balanceOf(ferdie.address);
 
         const remaining = new BN("5000000000000");
         const desired = new BN("1500000000000000000");
