@@ -13,6 +13,7 @@
     "node_modules",
     "**/*.spec.ts",
     "test/**/*",
+    "e2e-test/**/*",
     "dist/**/*"
   ],
   "_comment": "The accountant app contains typescript errors"

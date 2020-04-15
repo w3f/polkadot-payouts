@@ -412,6 +412,13 @@
   dependencies:
     winston "^3.2.1"
 
+"@w3f/logger@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@w3f/logger/-/logger-0.3.0.tgz#2d79e5705675c62bd1a593843546dd93eef5af17"
+  integrity sha512-wC9PMIxwBQKVx7Bn+1XjANlrKOuj31iXYMepCm9BiMCzTpO4ylZFYE4kNi8iYdrubPeQpFoIOV15rhsDFa1v7g==
+  dependencies:
+    winston "^3.2.1"
+
 "@w3f/polkadot-api-client@^0.1.2":
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@w3f/polkadot-api-client/-/polkadot-api-client-0.1.2.tgz#6818e1d4b73a2cb7cad11074f8cfdde61f8c199c"

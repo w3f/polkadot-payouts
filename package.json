@@ -25,7 +25,7 @@
     "@types/express": "^4.17.2",
     "@types/fs-extra": "^8.1.0",
     "@types/js-yaml": "^3.12.2",
-    "@w3f/logger": "^0.2.0",
+    "@w3f/logger": "^0.3.0",
     "@w3f/polkadot-api-client": "^0.1.2",
     "async-wait-until": "^1.2.4",
     "bn.js": "^5.1.1",
