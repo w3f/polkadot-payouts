@@ -1,5 +1,3 @@
-import { Balance } from '@polkadot/types/interfaces';
-
 export interface Keystore {
     filePath: string;
     passwordPath: string;

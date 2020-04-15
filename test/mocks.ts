@@ -8,6 +8,8 @@ export class LoggerMock {
     }
     debug(msg: string): void {
     }
+    error(msg: string): void {
+    }
 }
 
 export class ClientMock {
