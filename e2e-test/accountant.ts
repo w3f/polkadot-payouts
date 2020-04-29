@@ -1,7 +1,5 @@
-import { Client } from '@w3f/polkadot-api-client';
-import { TestRPC } from '@w3f/test-utils';
-import { Keyring } from '@polkadot/api';
-import { Balance } from '@polkadot/types/interfaces';
+import { Client, Balance, Keyring } from '@w3f/polkadot-api-client';
+import { TestPolkadotRPC } from '@w3f/test-utils';
 import BN from 'bn.js';
 import { should } from 'chai';
 import fs from 'fs-extra';
@@ -11,7 +9,7 @@ import { startAction } from '../src/actions/start';
 
 should();
 
-const testRPC = new TestRPC();
+const testRPC = new TestPolkadotRPC();
 const client = new Client(testRPC.endpoint());
 let keyring: Keyring;
 
