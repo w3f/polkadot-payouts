@@ -1,5 +1,4 @@
-import { Balance } from '@polkadot/types/interfaces';
-import { Keystore } from '@w3f/polkadot-api-client';
+import { ApiPromise, Keystore, Balance } from '@w3f/polkadot-api-client';
 import BN from 'bn.js';
 
 
@@ -20,6 +19,9 @@ export class ClientMock {
     }
     async balanceOfKeystore(keystore: Keystore): Promise<Balance> {
         return new BN(10) as Balance;
+    }
+    async api(): Promise<ApiPromise> {
+        return;
     }
     disconnect(): void { }
 }
