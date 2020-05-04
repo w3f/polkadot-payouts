@@ -10,20 +10,28 @@ import {
 
 import {
     Transaction,
-    TransactionRestriction
+    TransactionRestriction,
+    Claim
 } from './types';
 
 export class Accountant {
 
     constructor(
         private readonly transactions: Array<Transaction>,
+        private readonly claims: Array<Claim>,
         private readonly client: ApiClient,
         private readonly logger: Logger) { }
 
     async run(): Promise<void> {
+        if (this.claims.length > 0) {
+            for (let i = 0; i < this.claims.length; i++) {
+                this.logger.info(`Processing claim ${i} for ${this.claims[i].alias}`);
+                await this.processClaim(this.claims[i]);
+            }
+        }
         if (this.transactions.length > 0) {
             for (let i = 0; i < this.transactions.length; i++) {
-                this.logger.info(`tx ${i} from ${this.transactions[i].sender.alias} to ${this.transactions[i].receiver.alias}`);
+                this.logger.info(`Processing tx ${i} from ${this.transactions[i].sender.alias} to ${this.transactions[i].receiver.alias}`);
                 await this.processTx(this.transactions[i]);
             }
         }
@@ -39,6 +47,10 @@ export class Accountant {
         const amount = await this.determineAmount(tx.restriction, tx.sender.keystore, tx.receiver.address);
 
         return this.client.send(tx.sender.keystore, tx.receiver.address, amount);
+    }
+
+    private async processClaim(claim: Claim): Promise<void> {
+        return this.client.claim(claim.keystore);
     }
 
     private async determineAmount(restriction: TransactionRestriction, senderKeystore: Keystore, receiverAddr: string): Promise<Balance> {
