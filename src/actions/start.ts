@@ -15,5 +15,9 @@ export async function startAction(cmd: any): Promise<void> {
 
     const accountant = new Accountant(cfg.transactions, cfg.claims, client, logger);
 
-    await accountant.run();
+    try {
+        await accountant.run();
+    } catch (e) {
+        logger.error(`During accountant run: ${e.toString()}`);
+    }
 }
