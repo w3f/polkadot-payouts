@@ -26,8 +26,14 @@ export interface Transaction {
     restriction: TransactionRestriction;
 }
 
+export interface Claim {
+    alias: string;
+    keystore: Keystore;
+}
+
 export interface InputConfig {
     transactions: Array<Transaction>;
+    claims: Array<Claim>;
     wsEndpoint: string;
     logLevel: string;
 }
