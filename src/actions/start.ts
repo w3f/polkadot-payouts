@@ -13,7 +13,7 @@ export async function startAction(cmd: any): Promise<void> {
 
     const client = new Client(cfg.wsEndpoint, logger);
 
-    const accountant = new Accountant(cfg.transactions, client, logger);
+    const accountant = new Accountant(cfg.transactions, cfg.claims, client, logger);
 
     await accountant.run();
 }
