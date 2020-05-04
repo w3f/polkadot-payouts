@@ -22,11 +22,11 @@ transactions:
   restriction:
     desired: 10000000000000 # send desired - current_receiver_balance, if current_receiver_balance >= desired noop
 claims:
-- alias: validator1
+- alias: controller1
   keystore:
-    filePath: /validator1/keystore/data.json
-    passwordPath: /validator1/keystore/password.txt
-- alias: validator2
+    filePath: /controller1/keystore/data.json
+    passwordPath: /controller1/keystore/password.txt
+- alias: controller2
   keystore:
-    filePath: /validator2/keystore/path/
-    passwordPath: /validator2/keystore/password.txt
+    filePath: /controller2/keystore/path/
+    passwordPath: /ccontroller2/keystore/password.txt
