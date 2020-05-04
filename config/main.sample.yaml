@@ -3,10 +3,9 @@ wsEndpoint: "ws://localhost:11000"
 transactions:
 - sender:
     alias: sender1
-    address: 5CM4516HXdfAdWffkiDCBve7hukmNnP791cRf8kQNopeaWpX
     keystore:
-      filePath: /home/fgimenez/Desktop/accountant/test.json
-      passwordPath: /home/fgimenez/Desktop/accountant/password.txt
+      filePath: /sender1/keystore/data.json
+      passwordPath: /sender1/keystore/password.txt
   receiver:
     alias: receiver1
     address: 5DwAurocRcvfdozAuyojRwYVy9k7h8yekrrBKaDdfEhN13sJ
@@ -14,12 +13,20 @@ transactions:
     remaining: 850000000000000 # leave this much in the sender, send the rest
 - sender:
     alias: sender1
-    address: 5CM4516HXdfAdWffkiDCBve7hukmNnP791cRf8kQNopeaWpX
     keystore:
-      filePath: /home/fgimenez/Desktop/accountant/test.json
-      passwordPath: /home/fgimenez/Desktop/accountant/password.txt
+      filePath: /sender2/keystore/data.json
+      passwordPath: /sender1/keystore/password.txt
   receiver:
     alias: receiver2
     address: 5F7dw2gF9DfGoBVdaWfv8ZLTZHrj8wQ7JeSGsPFp7yNkuNdy
   restriction:
     desired: 10000000000000 # send desired - current_receiver_balance, if current_receiver_balance >= desired noop
+claims:
+- alias: validator1
+  keystore:
+    filePath: /validator1/keystore/data.json
+    passwordPath: /validator1/keystore/password.txt
+- alias: validator2
+  keystore:
+    filePath: /validator2/keystore/path/
+    passwordPath: /validator2/keystore/password.txt
