@@ -28,7 +28,9 @@ export interface Transaction {
     restriction: TransactionRestriction;
 }
 
-export interface Claim extends CommonActor { }
+export interface Claim extends CommonActor {
+    controllerAddress: string;
+}
 
 export interface InputConfig {
     transactions: Array<Transaction>;
