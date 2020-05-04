@@ -69,10 +69,12 @@ const defaultTransactions = (): Transaction[] => [
 
 const defaultClaims = (): Claim[] => [
     {
+        controllerAddress: "address1",
         keystore: keystore1,
         alias: "sender1",
     },
     {
+        controllerAddress: "address2",
         keystore: keystore2,
         alias: "sender2",
     }
