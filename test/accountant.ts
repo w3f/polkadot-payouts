@@ -132,6 +132,17 @@ describe('Accountant', () => {
             stub.callCount.should.eq(txs.length);
         });
 
+        it('should allow undefined claims', async () => {
+            const txs = defaultTransactions();
+            const subject = new Accountant(txs, undefined, client, logger);
+
+            const stub = sandbox.stub(client, 'send');
+
+            await subject.run();
+
+            stub.callCount.should.eq(txs.length);
+        });
+
         describe('restrictions', () => {
             it('should implement remaining', async () => {
                 await checkRestriction({
@@ -279,6 +290,17 @@ describe('Accountant', () => {
         it('should process all the claims in the config', async () => {
             const claims = defaultClaims();
             const subject = new Accountant([], claims, client, logger);
+
+            const stub = sandbox.stub(client, 'claim');
+
+            await subject.run();
+
+            stub.callCount.should.eq(claims.length);
+        });
+
+        it('should allow undefined transactions', async () => {
+            const claims = defaultClaims();
+            const subject = new Accountant(undefined, claims, client, logger);
 
             const stub = sandbox.stub(client, 'claim');
 

@@ -17,8 +17,8 @@ import {
 export class Accountant {
 
     constructor(
-        private readonly transactions: Array<Transaction>,
-        private readonly claims: Array<Claim>,
+        private readonly transactions: Array<Transaction> = [],
+        private readonly claims: Array<Claim> = [],
         private readonly client: ApiClient,
         private readonly logger: Logger) { }
 
