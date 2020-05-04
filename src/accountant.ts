@@ -50,7 +50,7 @@ export class Accountant {
     }
 
     private async processClaim(claim: Claim): Promise<void> {
-        return this.client.claim(claim.keystore);
+        return this.client.claim(claim.keystore, claim.controllerAddress);
     }
 
     private async determineAmount(restriction: TransactionRestriction, senderKeystore: Keystore, receiverAddr: string): Promise<Balance> {
