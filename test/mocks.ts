@@ -24,6 +24,6 @@ export class ClientMock {
         return;
     }
     disconnect(): void { }
-    async claim(keystore: Keystore): Promise<void> {
+    async claim(keystore: Keystore, address: string): Promise<void> {
     }
 }
