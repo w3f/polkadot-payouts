@@ -16,7 +16,7 @@ let keyring: Keyring;
 
 describe('E2E', () => {
     before(async () => {
-        await testRPC.start();
+        await testRPC.start('0.7.32');
         keyring = new Keyring({ type: 'sr25519' });
     });
 
@@ -73,6 +73,7 @@ transactions:
     address: ${ferdie.address}
   restriction:
     desired: "${desired}"
+claims: []
 `;
         const cfgFile = tmp.fileSync();
         fs.writeSync(cfgFile.fd, cfgContent);
