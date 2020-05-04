@@ -7,7 +7,7 @@ import { Balance } from '@polkadot/types/interfaces';
 
 import { LoggerMock, ClientMock } from './mocks';
 import { Accountant } from '../src/accountant';
-import { Transaction } from '../src/types';
+import { Transaction, Claim } from '../src/types';
 
 should();
 
@@ -67,6 +67,17 @@ const defaultTransactions = (): Transaction[] => [
     }
 ];
 
+const defaultClaims = (): Claim[] => [
+    {
+        keystore: keystore1,
+        alias: "sender1",
+    },
+    {
+        keystore: keystore2,
+        alias: "sender2",
+    }
+];
+
 let logger: LoggerMock;
 let client: ClientMock;
 
@@ -80,7 +91,7 @@ async function checkRestriction(cfg: checkReceiverInput): Promise<void> {
         desired: cfg.desired,
     };
 
-    const subject = new Accountant(txs, client, logger);
+    const subject = new Accountant(txs, [], client, logger);
 
     const sendStub = sandbox.stub(client, 'send');
     const balanceOfKeystoreStub = sandbox.stub(client, 'balanceOfKeystore');
@@ -109,13 +120,14 @@ describe('Accountant', () => {
         });
 
         it('should process all the transactions in the config', async () => {
-            const subject = new Accountant(defaultTransactions(), client, logger);
+            const txs = defaultTransactions();
+            const subject = new Accountant(txs, [], client, logger);
 
             const stub = sandbox.stub(client, 'send');
 
             await subject.run();
 
-            stub.calledTwice.should.be.true;
+            stub.callCount.should.eq(txs.length);
         });
 
         describe('restrictions', () => {
@@ -213,7 +225,7 @@ describe('Accountant', () => {
 
                 delete txs[0].receiver.address;
 
-                const subject = new Accountant(txs, client, logger);
+                const subject = new Accountant(txs, [], client, logger);
 
                 const stub = sandbox.stub(client, 'send');
 
@@ -249,11 +261,28 @@ describe('Accountant', () => {
                 balanceOfKeystoreStub.onFirstCall().resolves(senderBalance);
                 balanceOfStub.onFirstCall().resolves(receiverBalance);
 
-                const subject = new Accountant(txs, client, logger);
+                const subject = new Accountant(txs, [], client, logger);
                 await subject.run();
 
                 balanceOfKeystoreStub.calledWith(txs[0].sender.keystore).should.be.true;
             });
+        });
+    });
+
+    describe('claims', () => {
+        afterEach(() => {
+            sandbox.restore();
+        });
+
+        it('should process all the claims in the config', async () => {
+            const claims = defaultClaims();
+            const subject = new Accountant([], claims, client, logger);
+
+            const stub = sandbox.stub(client, 'claim');
+
+            await subject.run();
+
+            stub.callCount.should.eq(claims.length);
         });
     });
 });
