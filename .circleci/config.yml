@@ -15,7 +15,7 @@ jobs:
   e2eTests:
     docker:
       - image: node:12.16.1-alpine3.11
-      - image: parity/polkadot:v0.7.28
+      - image: parity/polkadot:v0.7.32
         name: polkadot
         command: --dev --ws-port 11000 --unsafe-ws-external
     steps:
@@ -28,7 +28,7 @@ jobs:
 
   buildImage:
     docker:
-      - image: web3f/ci-commons:v2.0.1
+      - image: web3f/ci-commons:v2.1.1
     steps:
       - checkout
       - setup_remote_docker
@@ -38,7 +38,7 @@ jobs:
 
   helmLint:
     docker:
-      - image: web3f/ci-commons:v2.0.1
+      - image: web3f/ci-commons:v2.1.1
     steps:
       - checkout
       - run:
@@ -47,7 +47,7 @@ jobs:
 
   integrationTests:
     docker:
-      - image: web3f/ci-commons:v2.0.1
+      - image: web3f/ci-commons:v2.1.1
     steps:
       - checkout
       - setup_remote_docker
@@ -58,7 +58,7 @@ jobs:
 
   publishImage:
     docker:
-      - image: web3f/ci-commons:v2.0.1
+      - image: web3f/ci-commons:v2.1.1
     steps:
       - checkout
       - setup_remote_docker
@@ -68,7 +68,7 @@ jobs:
 
   publishChart:
     docker:
-      - image: web3f/ci-commons:v2.0.1
+      - image: web3f/ci-commons:v2.1.1
     steps:
       - checkout
       - run:

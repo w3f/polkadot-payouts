@@ -3,15 +3,17 @@ export interface Keystore {
     passwordPath: string;
 }
 
-interface TransactionActor {
+interface BaseActor {
     alias: string;
 }
 
-interface TransactionSender extends TransactionActor {
+interface CommonActor extends BaseActor {
     keystore: Keystore;
 }
 
-interface TransactionReceiver extends TransactionActor {
+interface TransactionSender extends CommonActor { }
+
+interface TransactionReceiver extends BaseActor {
     address: string;
 }
 
@@ -26,8 +28,13 @@ export interface Transaction {
     restriction: TransactionRestriction;
 }
 
+export interface Claim extends CommonActor {
+    controllerAddress: string;
+}
+
 export interface InputConfig {
     transactions: Array<Transaction>;
+    claims: Array<Claim>;
     wsEndpoint: string;
     logLevel: string;
 }

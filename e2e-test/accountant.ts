@@ -1,7 +1,5 @@
-import { Client } from '@w3f/polkadot-api-client';
-import { TestRPC } from '@w3f/test-utils';
-import { Keyring } from '@polkadot/api';
-import { Balance } from '@polkadot/types/interfaces';
+import { Client, Balance, Keyring } from '@w3f/polkadot-api-client';
+import { TestPolkadotRPC } from '@w3f/test-utils';
 import BN from 'bn.js';
 import { should } from 'chai';
 import fs from 'fs-extra';
@@ -11,14 +9,14 @@ import { startAction } from '../src/actions/start';
 
 should();
 
-const testRPC = new TestRPC();
+const testRPC = new TestPolkadotRPC();
 const client = new Client(testRPC.endpoint());
 let keyring: Keyring;
 
 
 describe('E2E', () => {
     before(async () => {
-        await testRPC.start();
+        await testRPC.start('0.7.32');
         keyring = new Keyring({ type: 'sr25519' });
     });
 
@@ -75,6 +73,7 @@ transactions:
     address: ${ferdie.address}
   restriction:
     desired: "${desired}"
+claims: []
 `;
         const cfgFile = tmp.fileSync();
         fs.writeSync(cfgFile.fd, cfgContent);
