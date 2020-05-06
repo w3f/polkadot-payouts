@@ -2,7 +2,7 @@
 
 # polkadot-payouts
 
-Utility to claim and transfer your Kusama/Polkadot validattor rewards.
+Utility to claim and transfer your Kusama/Polkadot validator rewards.
 
 # How it works
 
