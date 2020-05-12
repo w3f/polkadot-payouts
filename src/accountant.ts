@@ -1,11 +1,11 @@
-import { Balance } from '@polkadot/types/interfaces';
 import BN from 'bn.js';
 import { Logger } from '@w3f/logger';
 import {
     ApiClient,
     Keystore,
     ZeroBalance,
-    MinimumSenderBalance
+    MinimumSenderBalance,
+    Balance
 } from '@w3f/polkadot-api-client';
 
 import {

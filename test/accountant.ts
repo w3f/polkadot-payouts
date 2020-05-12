@@ -3,7 +3,7 @@ import { should } from 'chai';
 import fs from 'fs-extra';
 import * as sinon from 'sinon';
 import tmp from 'tmp';
-import { Balance } from '@polkadot/types/interfaces';
+import { Balance } from '@w3f/polkadot-api-client';
 
 import { LoggerMock, ClientMock } from './mocks';
 import { Accountant } from '../src/accountant';
