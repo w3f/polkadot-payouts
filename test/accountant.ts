@@ -1,11 +1,12 @@
 import BN from 'bn.js';
 import { should } from 'chai';
-import fs from 'fs-extra';
+import * as fs from 'fs-extra';
 import * as sinon from 'sinon';
-import tmp from 'tmp';
+import * as tmp from 'tmp';
 import { Balance } from '@w3f/polkadot-api-client';
+import { Logger, createLogger } from '@w3f/logger';
 
-import { LoggerMock, ClientMock } from './mocks';
+import { ClientMock } from './mocks';
 import { Accountant } from '../src/accountant';
 import { Transaction, Claim } from '../src/types';
 
@@ -80,7 +81,7 @@ const defaultClaims = (): Claim[] => [
     }
 ];
 
-let logger: LoggerMock;
+let logger: Logger;
 let client: ClientMock;
 
 async function checkRestriction(cfg: checkReceiverInput): Promise<void> {
@@ -112,7 +113,7 @@ async function checkRestriction(cfg: checkReceiverInput): Promise<void> {
 
 describe('Accountant', () => {
     beforeEach(() => {
-        logger = new LoggerMock();
+        logger = createLogger();
         client = new ClientMock();
     });
 

@@ -2,15 +2,6 @@ import { ApiPromise, Keystore, Balance } from '@w3f/polkadot-api-client';
 import BN from 'bn.js';
 
 
-export class LoggerMock {
-    info(msg: string): void {
-    }
-    debug(msg: string): void {
-    }
-    error(msg: string): void {
-    }
-}
-
 export class ClientMock {
     async send(keystore: Keystore, recipentAddress: string, amount: Balance): Promise<void> {
     }
