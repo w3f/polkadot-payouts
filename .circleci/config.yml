@@ -3,7 +3,7 @@ version: 2
 jobs:
   unitTests:
     docker:
-      - image: node:12.16.1-alpine3.11
+      - image: web3f/node:v0.1.0
     steps:
       - checkout
       - run: yarn
@@ -14,10 +14,10 @@ jobs:
 
   e2eTests:
     docker:
-      - image: node:12.16.1-alpine3.11
-      - image: parity/polkadot:v0.7.33
+      - image: web3f/node:v0.1.0
+      - image: parity/polkadot:v0.8.8
         name: polkadot
-        command: --dev --ws-port 11000 --unsafe-ws-external
+        command: --chain=kusama-dev --alice --ws-port 11000 --ws-external --rpc-methods=Unsafe --rpc-cors=all
     steps:
       - checkout
       - run: yarn
