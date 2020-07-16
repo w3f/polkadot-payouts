@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo Pathing...
+echo patching...
 
 sed -i "/parity\/polkadot/c\      - image: parity\/polkadot:$latest_upstream " .circleci/config.yml
 
