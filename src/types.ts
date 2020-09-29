@@ -37,6 +37,7 @@ export interface InputConfig {
     claims: Array<Claim>;
     wsEndpoint: string;
     logLevel: string;
+    minimumSenderBalance: number;
 }
 
 export interface CmdOptions {
