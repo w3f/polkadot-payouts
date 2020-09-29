@@ -4,7 +4,6 @@ import {
     ApiClient,
     Keystore,
     ZeroBalance,
-    MinimumSenderBalance,
     Balance
 } from '@w3f/polkadot-api-client';
 
@@ -15,12 +14,17 @@ import {
 } from './types';
 
 export class Accountant {
+    private minimumSenderBalance: Balance;
 
     constructor(
         private readonly transactions: Array<Transaction> = [],
         private readonly claims: Array<Claim> = [],
+        private readonly minimumSenderBalanceInput: number,
         private readonly client: ApiClient,
-        private readonly logger: Logger) { }
+        private readonly logger: Logger) {
+
+        this.minimumSenderBalance = new BN(minimumSenderBalanceInput) as Balance
+    }
 
     async run(): Promise<void> {
         if (this.claims.length > 0) {
@@ -63,7 +67,7 @@ export class Accountant {
         }
 
         const senderBalance: Balance = await this.client.balanceOfKeystore(senderKeystore);
-        if (senderBalance.lt(MinimumSenderBalance)) {
+        if (senderBalance.lt(this.minimumSenderBalance)) {
             this.logger.info(`sender doesn't have enough funds: ${senderBalance}`);
             return ZeroBalance;
         }
@@ -84,7 +88,7 @@ export class Accountant {
                 return ZeroBalance;
             }
             const ideal = desired.sub(receiverBalance) as Balance;
-            const availableSend = senderBalance.sub(MinimumSenderBalance) as Balance;
+            const availableSend = senderBalance.sub(this.minimumSenderBalance) as Balance;
             if (ideal.gt(availableSend)) {
                 this.logger.info(`best effort, not enough funds in sender, sending ${availableSend}`);
                 return availableSend;
@@ -93,8 +97,8 @@ export class Accountant {
             return ideal;
         }
 
-        if (remainingBalance.lt(MinimumSenderBalance)) {
-            this.logger.info(`restriction.remaining is < ${MinimumSenderBalance} (${remainingBalance})`);
+        if (remainingBalance.lt(this.minimumSenderBalance)) {
+            this.logger.info(`restriction.remaining is < ${this.minimumSenderBalance} (${remainingBalance})`);
             return ZeroBalance;
         }
         return senderBalance.sub(remainingBalance) as Balance;
