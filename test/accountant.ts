@@ -84,6 +84,8 @@ const defaultClaims = (): Claim[] => [
 let logger: Logger;
 let client: ClientMock;
 
+const MinimumSenderBalance = 10000000000;
+
 async function checkRestriction(cfg: checkReceiverInput): Promise<void> {
     const txs = defaultTransactions();
 
@@ -94,7 +96,7 @@ async function checkRestriction(cfg: checkReceiverInput): Promise<void> {
         desired: cfg.desired,
     };
 
-    const subject = new Accountant(txs, [], client, logger);
+    const subject = new Accountant(txs, [], MinimumSenderBalance, client, logger);
 
     const sendStub = sandbox.stub(client, 'send');
     const balanceOfKeystoreStub = sandbox.stub(client, 'balanceOfKeystore');
@@ -124,7 +126,7 @@ describe('Accountant', () => {
 
         it('should process all the transactions in the config', async () => {
             const txs = defaultTransactions();
-            const subject = new Accountant(txs, [], client, logger);
+            const subject = new Accountant(txs, [], MinimumSenderBalance, client, logger);
 
             const stub = sandbox.stub(client, 'send');
 
@@ -135,7 +137,7 @@ describe('Accountant', () => {
 
         it('should allow undefined claims', async () => {
             const txs = defaultTransactions();
-            const subject = new Accountant(txs, undefined, client, logger);
+            const subject = new Accountant(txs, undefined, MinimumSenderBalance, client, logger);
 
             const stub = sandbox.stub(client, 'send');
 
@@ -161,18 +163,20 @@ describe('Accountant', () => {
                     expectedSent: 150000000000000
                 });
             });
-            it('should return 0 if sender balance is less than 1', async () => {
+            it('should return 0 if sender balance is less than minimum', async () => {
+                const senderBalance = MinimumSenderBalance - 100;
                 await checkRestriction({
-                    senderBalance: 500000000000,
+                    senderBalance,
                     remaining: 0,
                     desired: 0,
                     expectedSent: 0
                 });
             });
-            it('should return 0 if remaining is less than 1', async () => {
+            it('should return 0 if remaining is less than minimum', async () => {
+                const remaining = MinimumSenderBalance - 100;
                 await checkRestriction({
                     senderBalance: 200000000000000,
-                    remaining: 500000000000,
+                    remaining,
                     desired: 0,
                     expectedSent: 0
                 });
@@ -213,12 +217,14 @@ describe('Accountant', () => {
                 });
             });
             it('should send desired on best effort', async () => {
+                const senderBalance = 10000000000000;
+                const expectedSent = senderBalance - MinimumSenderBalance;
                 await checkRestriction({
-                    senderBalance: 10000000000000,
+                    senderBalance,
                     receiverBalance: 50000000000000,
                     remaining: 0,
                     desired: 100000000000000,
-                    expectedSent: 9000000000000
+                    expectedSent: expectedSent
                 });
             });
             it('should return 0 if both remaining and desired are present', async () => {
@@ -239,7 +245,7 @@ describe('Accountant', () => {
 
                 delete txs[0].receiver.address;
 
-                const subject = new Accountant(txs, [], client, logger);
+                const subject = new Accountant(txs, [], MinimumSenderBalance, client, logger);
 
                 const stub = sandbox.stub(client, 'send');
 
@@ -275,7 +281,7 @@ describe('Accountant', () => {
                 balanceOfKeystoreStub.onFirstCall().resolves(senderBalance);
                 balanceOfStub.onFirstCall().resolves(receiverBalance);
 
-                const subject = new Accountant(txs, [], client, logger);
+                const subject = new Accountant(txs, [], MinimumSenderBalance, client, logger);
                 await subject.run();
 
                 balanceOfKeystoreStub.calledWith(txs[0].sender.keystore).should.be.true;
@@ -290,7 +296,7 @@ describe('Accountant', () => {
 
         it('should process all the claims in the config', async () => {
             const claims = defaultClaims();
-            const subject = new Accountant([], claims, client, logger);
+            const subject = new Accountant([], claims, MinimumSenderBalance, client, logger);
 
             const stub = sandbox.stub(client, 'claim');
 
@@ -301,7 +307,7 @@ describe('Accountant', () => {
 
         it('should allow undefined transactions', async () => {
             const claims = defaultClaims();
-            const subject = new Accountant(undefined, claims, client, logger);
+            const subject = new Accountant(undefined, claims, MinimumSenderBalance, client, logger);
 
             const stub = sandbox.stub(client, 'claim');
 

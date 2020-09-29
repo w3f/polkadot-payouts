@@ -6,7 +6,7 @@ Utility to claim and transfer your Kusama/Polkadot validator rewards.
 
 # How it works
 
-The tool uses a configuration file to request pending payout claims and optionally send the rewards to different accounts. 
+The tool uses a configuration file to request pending payout claims and optionally send the rewards to different accounts.
 
 You can start by cloning the repo and installiing the dependencies, NodeJS and Yarn are required:
 ```
@@ -18,7 +18,7 @@ Then you should create a configuration file, you can start by copying a sample p
 ```
 $ cp config/main.sample.yaml config/main.yaml
 ```
-Now you can customize `config/main.yaml`, see [Configuration](#configuration) about how to do it. Once you are done you 
+Now you can customize `config/main.yaml`, see [Configuration](#configuration) about how to do it. Once you are done you
 can run the tool with:
 ```
 $ yarn start
@@ -30,6 +30,7 @@ This is a typical configuration file:
 # config/main.yaml
 logLevel: info
 wsEndpoint: "wss://kusama-rpc.polkadot.io/"
+minimumSenderBalance: 100000000000 # bellow this value transfers are not sent by the tool
 claims:
 - alias: validator-000
   controllerAddress: "<validator-000-controller-address>"
@@ -74,7 +75,7 @@ accessible by the user running the tool.
 
 ## Transactions
 Each of the transaction elements should have information about the sender and the receciver. For the sender, the keystore
-information is enough. For the receiver you need to specify the address and a potential restriction in the transaction. The 
+information is enough. For the receiver you need to specify the address and a potential restriction in the transaction. The
 restriction can have two different fields:
 * remaining: leave this much in the sender, send the rest
 * desired: send desired minus the receiver current balance, so that at the end the reeiver balance matches the `desired` value. If the balance of the receiver is greater than the desired vallue then no action is taken.
