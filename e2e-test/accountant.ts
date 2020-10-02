@@ -16,7 +16,7 @@ let keyring: Keyring;
 
 describe('E2E', () => {
     before(async () => {
-        await testRPC.start('0.7.32');
+        await testRPC.start();
         keyring = new Keyring({ type: 'sr25519' });
     });
 
