@@ -485,10 +485,10 @@
     fs-extra "^9.0.0"
     ws "6.1.2"
 
-"@w3f/test-utils@0.8.6":
-  version "0.8.6"
-  resolved "https://registry.yarnpkg.com/@w3f/test-utils/-/test-utils-0.8.6.tgz#f5da8e07e13ac5c39f80f286878a72c3dee0ee2b"
-  integrity sha512-kEnbNinKZj/jix5pN0fa5IXb1BTphuKKZ3QV5xSGkkMduQbSWkeAmsebX2iatq0q1/NbJtv8vj9OgNHRcs2pnA==
+"@w3f/test-utils@0.8.7":
+  version "0.8.7"
+  resolved "https://registry.yarnpkg.com/@w3f/test-utils/-/test-utils-0.8.7.tgz#d4c183deac13320c6ce0f398ecd9d6738149ec97"
+  integrity sha512-nqjuKihyI3cILf/F/yqwg6U0OwjmqiEs49fzLzuNlxhv/n3Q27FrCtk2HABKGWMuMvoqQ8XdndkLLSICn75+rA==
   dependencies:
     "@polkadot/api" "1.32.1"
     "@w3f/logger" "^0.4.0"
