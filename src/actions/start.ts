@@ -6,7 +6,7 @@ import { Accountant } from '../accountant';
 import { InputConfig } from '../types';
 
 
-export async function startAction(cmd: any): Promise<void> {
+export async function startAction(cmd): Promise<void> {
     const cfg = new Config<InputConfig>().parse(cmd.config);
 
     const logger = createLogger(cfg.logLevel);
