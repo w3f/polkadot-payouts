@@ -40,9 +40,4 @@ export interface InputConfig {
     minimumSenderBalance: number;
 }
 
-export interface CmdOptions {
-    detached?: boolean;
-    matcher?: RegExp;
-    verbose?: boolean;
-    env?: any;
-}
+
