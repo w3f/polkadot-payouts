@@ -305,15 +305,15 @@ describe('Accountant', () => {
             stub.callCount.should.eq(claims.length);
         });
 
-        // it('should allow undefined transactions', async () => {
-        //     const claims = defaultClaims();
-        //     const subject = new Accountant({transactions:undefined, claims, minimumSenderBalance:MinimumSenderBalance}, client, logger);
+        it('should allow undefined transactions', async () => {
+            const claims = defaultClaims();
+            const subject = new Accountant({transactions:undefined, claims, minimumSenderBalance:MinimumSenderBalance}, client, logger);
 
-        //     const stub = sandbox.stub(client, 'claim');
+            const stub = sandbox.stub(client, 'claim');
 
-        //     await subject.run();
+            await subject.run();
 
-        //     stub.callCount.should.eq(claims.length);
-        // });
+            stub.callCount.should.eq(claims.length);
+        });
     });
 });
