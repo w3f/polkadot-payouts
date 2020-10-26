@@ -475,10 +475,10 @@
   dependencies:
     winston "^3.3.3"
 
-"@w3f/polkadot-api-client@^0.7.4":
-  version "0.7.4"
-  resolved "https://registry.yarnpkg.com/@w3f/polkadot-api-client/-/polkadot-api-client-0.7.4.tgz#ae68f8dc824d7f71cc18e122f4b811708a159515"
-  integrity sha512-/3O2/0MTNNPvJ68lCZvI5SXNeWukdLii1i+ZwOW7oSV0hUaZV3meWt4jK/0HVAl5is8XFCTlVCBzz2PRuRmcaA==
+"@w3f/polkadot-api-client@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@w3f/polkadot-api-client/-/polkadot-api-client-0.8.0.tgz#42113f068cd487fd4f1dd48d506499a9cc596794"
+  integrity sha512-IS33lq76sLnh+/h/ARUTW351k/EuireOAZI0cFtgvxQDN/a7E3QKYTLesVgxmpiKzEjUkEnwq16cLGbqoFSfnw==
   dependencies:
     "@polkadot/api" "^2.3.1"
     "@polkadot/keyring" "^3.6.1"
