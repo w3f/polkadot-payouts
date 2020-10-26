@@ -40,7 +40,7 @@ export interface AccountantInputConfig {
     transactions: Array<Transaction>;
     claims: Array<Claim>;
     minimumSenderBalance: number;
-    isHistoryCheckForced?: boolean;
+    isDeepHistoryCheckForced?: boolean;
 }
 
 export interface InputConfig extends AccountantInputConfig {

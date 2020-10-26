@@ -15,7 +15,7 @@ import {
 
 export class Accountant {
     private minimumSenderBalance: Balance;
-    private isHistoryCheckForced = false;
+    private isDeepHistoryCheckForced = false;
     private transactions: Array<Transaction> = [];
     private claims: Array<Claim> = [];
 
@@ -26,7 +26,7 @@ export class Accountant {
         this.minimumSenderBalance = new BN(cfg.minimumSenderBalance) as Balance
         if(cfg.transactions) this.transactions = cfg.transactions
         if(cfg.claims) this.claims = cfg.claims     
-        if(cfg.isHistoryCheckForced) this.isHistoryCheckForced = cfg.isHistoryCheckForced
+        if(cfg.isDeepHistoryCheckForced) this.isDeepHistoryCheckForced = cfg.isDeepHistoryCheckForced
     }
 
     async run(): Promise<void> {
@@ -57,7 +57,7 @@ export class Accountant {
     }
 
     private async processClaim(claim: Claim): Promise<void> {
-        return this.client.claim(claim.keystore, claim.controllerAddress, this.isHistoryCheckForced);
+        return this.client.claim(claim.keystore, claim.controllerAddress, this.isDeepHistoryCheckForced);
     }
 
     private async determineAmount(restriction: TransactionRestriction, senderKeystore: Keystore, receiverAddr: string): Promise<Balance> {
