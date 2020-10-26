@@ -1,4 +1,5 @@
-import { Client, Balance, Keyring } from '@w3f/polkadot-api-client';
+import { Balance, Keyring } from '@w3f/polkadot-api-client';
+import { Client } from '../src/client';
 import { TestPolkadotRPC } from '@w3f/test-utils';
 import BN from 'bn.js';
 import { should } from 'chai';

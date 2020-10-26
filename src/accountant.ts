@@ -1,7 +1,6 @@
 import BN from 'bn.js';
 import { Logger } from '@w3f/logger';
 import {
-    ApiClient,
     Keystore,
     ZeroBalance,
     Balance
@@ -10,20 +9,24 @@ import {
 import {
     Transaction,
     TransactionRestriction,
-    Claim
+    Claim,
+    ApiClient, AccountantInputConfig
 } from './types';
 
 export class Accountant {
     private minimumSenderBalance: Balance;
+    private isDeepHistoryCheckForced = false;
+    private transactions: Array<Transaction> = [];
+    private claims: Array<Claim> = [];
 
     constructor(
-        private readonly transactions: Array<Transaction> = [],
-        private readonly claims: Array<Claim> = [],
-        private readonly minimumSenderBalanceInput: number,
+        cfg: AccountantInputConfig,
         private readonly client: ApiClient,
         private readonly logger: Logger) {
-
-        this.minimumSenderBalance = new BN(minimumSenderBalanceInput) as Balance
+        this.minimumSenderBalance = new BN(cfg.minimumSenderBalance) as Balance
+        if(cfg.transactions) this.transactions = cfg.transactions
+        if(cfg.claims) this.claims = cfg.claims     
+        if(cfg.isDeepHistoryCheckForced) this.isDeepHistoryCheckForced = cfg.isDeepHistoryCheckForced
     }
 
     async run(): Promise<void> {
@@ -54,7 +57,7 @@ export class Accountant {
     }
 
     private async processClaim(claim: Claim): Promise<void> {
-        return this.client.claim(claim.keystore, claim.controllerAddress);
+        return this.client.claim(claim.keystore, claim.controllerAddress, this.isDeepHistoryCheckForced);
     }
 
     private async determineAmount(restriction: TransactionRestriction, senderKeystore: Keystore, receiverAddr: string): Promise<Balance> {

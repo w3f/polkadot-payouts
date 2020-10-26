@@ -1,3 +1,7 @@
+import {
+  ApiClient as ApiClientW3f,
+} from '@w3f/polkadot-api-client';
+
 export interface Keystore {
     filePath: string;
     passwordPath: string;
@@ -32,12 +36,20 @@ export interface Claim extends CommonActor {
     controllerAddress: string;
 }
 
-export interface InputConfig {
+export interface AccountantInputConfig {
     transactions: Array<Transaction>;
     claims: Array<Claim>;
-    wsEndpoint: string;
-    logLevel: string;
     minimumSenderBalance: number;
+    isDeepHistoryCheckForced?: boolean;
+}
+
+export interface InputConfig extends AccountantInputConfig {
+  wsEndpoint: string;
+  logLevel: string;
+}
+
+export interface ApiClient extends ApiClientW3f {
+  claim(controllerKeystore: Keystore, validatorStash: string, isHistoryCheckForced?: boolean): Promise<void>;
 }
 
 

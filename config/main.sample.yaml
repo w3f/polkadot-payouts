@@ -1,5 +1,6 @@
 logLevel: info
 wsEndpoint: "ws://localhost:11000"
+isDeepHistoryCheckForced: true
 transactions:
 - sender:
     alias: sender1

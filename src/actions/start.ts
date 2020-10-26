@@ -1,5 +1,5 @@
 import { createLogger } from '@w3f/logger';
-import { Client } from '@w3f/polkadot-api-client';
+import { Client } from '../client';
 import { Config } from '@w3f/config';
 
 import { Accountant } from '../accountant';
@@ -13,7 +13,7 @@ export async function startAction(cmd): Promise<void> {
 
     const client = new Client(cfg.wsEndpoint, logger);
 
-    const accountant = new Accountant(cfg.transactions, cfg.claims, cfg.minimumSenderBalance, client, logger);
+    const accountant = new Accountant(cfg, client, logger);
 
     try {
         await accountant.run();
