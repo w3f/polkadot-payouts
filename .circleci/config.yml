@@ -15,7 +15,7 @@ jobs:
   e2eTests:
     docker:
       - image: web3f/node:v0.1.0
-      - image: parity/polkadot:v0.8.26-1 
+      - image: parity/polkadot:v0.8.27
         name: polkadot
         command: --chain=kusama-dev --alice --ws-port 11000 --ws-external --rpc-methods=Unsafe --rpc-cors=all
     steps:
@@ -28,7 +28,7 @@ jobs:
 
   buildImage:
     docker:
-      - image: web3f/ci-commons:v2.1.3
+      - image: web3f/ci-commons:v2.4.4
     steps:
       - checkout
       - setup_remote_docker
@@ -38,7 +38,7 @@ jobs:
 
   helmLint:
     docker:
-      - image: web3f/ci-commons:v2.1.3
+      - image: web3f/ci-commons:v2.4.4
     steps:
       - checkout
       - run:
@@ -47,7 +47,7 @@ jobs:
 
   integrationTests:
     docker:
-      - image: web3f/ci-commons:v2.1.3
+      - image: web3f/ci-commons:v2.4.4
     steps:
       - checkout
       - setup_remote_docker
@@ -58,7 +58,7 @@ jobs:
 
   publishImage:
     docker:
-      - image: web3f/ci-commons:v2.1.3
+      - image: web3f/ci-commons:v2.4.4
     steps:
       - checkout
       - setup_remote_docker
@@ -68,7 +68,7 @@ jobs:
 
   publishChart:
     docker:
-      - image: web3f/ci-commons:v2.1.3
+      - image: web3f/ci-commons:v2.4.4
     steps:
       - checkout
       - run:
