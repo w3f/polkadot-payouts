@@ -1,6 +1,6 @@
 {
   "name": "accountant",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Automated transfers among accounts",
   "repository": "git@github.com:w3f/accountant.git",
   "author": "W3F Infrastructure Team <devops@web3.foundation>",
