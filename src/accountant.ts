@@ -10,7 +10,7 @@ import {
     Transaction,
     TransactionRestriction,
     Claim,
-    ApiClient, AccountantInputConfig
+    ApiClient, AccountantInputConfig, ClaimsThirdParty, Target
 } from './types';
 
 export class Accountant {
@@ -18,6 +18,7 @@ export class Accountant {
     private isDeepHistoryCheckForced = false;
     private transactions: Array<Transaction> = [];
     private claims: Array<Claim> = [];
+    private claimsThirdParty: ClaimsThirdParty;
 
     constructor(
         cfg: AccountantInputConfig,
@@ -25,7 +26,8 @@ export class Accountant {
         private readonly logger: Logger) {
         this.minimumSenderBalance = new BN(cfg.minimumSenderBalance) as Balance
         if(cfg.transactions) this.transactions = cfg.transactions
-        if(cfg.claims) this.claims = cfg.claims     
+        if(cfg.claims) this.claims = cfg.claims    
+        if(cfg.claimsThirdParty) this.claimsThirdParty = cfg.claimsThirdParty
         if(cfg.isDeepHistoryCheckForced) this.isDeepHistoryCheckForced = cfg.isDeepHistoryCheckForced
     }
 
@@ -36,6 +38,12 @@ export class Accountant {
                 await this.processClaim(this.claims[i]);
             }
         }
+        if (this.claimsThirdParty?.targets.length > 0) {
+          for (let i = 0; i < this.claimsThirdParty.targets.length; i++) {
+              this.logger.info(`Processing third party claim ${i} for ${this.claimsThirdParty.targets[i].alias}`);
+              await this.processClaimThirdParty(this.claimsThirdParty.claimerKeystore,this.claimsThirdParty.targets[i]);
+          }
+        } 
         if (this.transactions.length > 0) {
             for (let i = 0; i < this.transactions.length; i++) {
                 this.logger.info(`Processing tx ${i} from ${this.transactions[i].sender.alias} to ${this.transactions[i].receiver.alias}`);
@@ -59,6 +67,10 @@ export class Accountant {
     private async processClaim(claim: Claim): Promise<void> {
         return this.client.claim(claim.keystore, claim.controllerAddress, this.isDeepHistoryCheckForced);
     }
+
+    private async processClaimThirdParty(claimer: Keystore, validatorTarger: Target): Promise<void> {
+      return this.client.claimForValidator(validatorTarger.validatorAddress,claimer,this.isDeepHistoryCheckForced);
+  }
 
     private async determineAmount(restriction: TransactionRestriction, senderKeystore: Keystore, receiverAddr: string): Promise<Balance> {
         if (restriction.desired &&

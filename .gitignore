@@ -1,6 +1,5 @@
 node_modules/
-config/main.yaml
 dist/
 yarn-error.log
 config/*
-!config/main.sample.yaml
+!config/*sample*

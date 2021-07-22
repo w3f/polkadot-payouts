@@ -24,8 +24,14 @@ can run the tool with:
 $ yarn start
 ```
 
-# Configuration
-This is a typical configuration file:
+# Features
+
+- Claim for yourself
+- Claim for a third party
+- Transfer to a destination wallet what you have just claimed
+
+# Configuration - Claim for yourself and transfer to a destination wallet
+This is a typical configuration file to use the "Claim for yourself and transfer to destination wallet" feature:
 ```
 # config/main.yaml
 logLevel: info
@@ -73,9 +79,27 @@ of the controller account of the validator and information about the validator s
 file and the path of a file containing the password of the keystore. You take special ccare to make this files only
 accessible by the user running the tool.
 
-## Transactions
+### Transactions
 Each of the transaction elements should have information about the sender and the receciver. For the sender, the keystore
 information is enough. For the receiver you need to specify the address and a potential restriction in the transaction. The
 restriction can have two different fields:
 * remaining: leave this much in the sender, send the rest
 * desired: send desired minus the receiver current balance, so that at the end the reeiver balance matches the `desired` value. If the balance of the receiver is greater than the desired vallue then no action is taken.
+
+# Configuration - Claim for a third party
+This is a typical configuration file to use the "Claim for a third party" feature:
+```
+# config/main.yaml
+logLevel: info
+wsEndpoint: "wss://kusama-rpc.polkadot.io/"
+claimsThirdParty:
+  claimerKeystore:
+    filePath: /path/to/validator-000/keystore
+    passwordPath: /path/to/validator-000/keystore/password
+  targets:
+  - alias: validator-000
+    validatorAddress: "<validator-000-stash-address>"
+  - alias: validator-001
+    validatorAddress: "<validator-001-stash-address>"  
+```
+You should define the RPC endpoint to use in the `wsEndpoint` field.

@@ -1,5 +1,5 @@
 logLevel: info
-wsEndpoint: "ws://localhost:11000"
+wsEndpoint: "wss://rpc.polkadot.io/"
 isDeepHistoryCheckForced: true
 transactions:
 - sender:

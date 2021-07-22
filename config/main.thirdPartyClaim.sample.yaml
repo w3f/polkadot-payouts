@@ -1,0 +1,12 @@
+logLevel: info
+wsEndpoint: "wss://kusama-rpc.polkadot.io/"
+isDeepHistoryCheckForced: true
+claimsThirdParty:
+  claimerKeystore:
+    filePath: /path/to/validator-000/keystore
+    passwordPath: /path/to/validator-000/keystore/password
+  targets:
+  - alias: validator-000
+    validatorAddress: "<validator-000-stash-address>"
+  - alias: validator-001
+    validatorAddress: "<validator-001-stash-address>"  
