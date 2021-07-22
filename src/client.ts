@@ -35,6 +35,7 @@ export class Client extends ClientW3f {
 
         let numOfUnclaimPayouts = currentEra.index - lastReward - 1;
         let start = 1;
+        let numOfClaimedPayouts = 0
         while (numOfUnclaimPayouts > 0) {
             const payoutCalls = [];
             let txLimit = numOfUnclaimPayouts;
@@ -53,9 +54,15 @@ export class Client extends ClientW3f {
             }
             this.currentTxDone = false;
             try {
+              if (payoutCalls.length > 0) {
                 await this._api.tx.utility
                     .batch(payoutCalls)
                     .signAndSend(keyPair, this.sendStatusCb.bind(this));
+                numOfClaimedPayouts += payoutCalls.length    
+              } 
+              else{
+                this.currentTxDone = true
+              }
             } catch (e) {
                 this.logger.error(`Could not request claim for ${keyPair.address}: ${e}`);
             }
@@ -67,7 +74,7 @@ export class Client extends ClientW3f {
             numOfUnclaimPayouts -= txLimit;
             start += txLimit;
         }
-        this.logger.info(`All payouts have been claimed for ${keyPair.address}.`);
+        this.logger.info(`All payouts ( ${numOfClaimedPayouts} ) have been claimed for ${keyPair.address}.`);
     }
 
     public async claimForValidator(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced = false): Promise<void> {
@@ -96,7 +103,6 @@ export class Client extends ClientW3f {
       }
 
       let numOfUnclaimPayouts = currentEra.index - lastReward - 1;
-
       let start = 1;
       let numOfClaimedPayouts = 0
       while (numOfUnclaimPayouts > 0) {
