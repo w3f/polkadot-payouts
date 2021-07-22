@@ -36,9 +36,21 @@ export interface Claim extends CommonActor {
     controllerAddress: string;
 }
 
+export interface ClaimsThirdParty {
+  claimerKeystore: Keystore;
+  targets: Array<Target>;
+}
+
+export interface Target {
+  alias: string;
+  validatorAddress: string;
+}
+
+
 export interface AccountantInputConfig {
     transactions: Array<Transaction>;
     claims: Array<Claim>;
+    claimsThirdParty?: ClaimsThirdParty;
     minimumSenderBalance: number;
     isDeepHistoryCheckForced?: boolean;
 }
@@ -50,6 +62,7 @@ export interface InputConfig extends AccountantInputConfig {
 
 export interface ApiClient extends ApiClientW3f {
   claim(controllerKeystore: Keystore, validatorStash: string, isHistoryCheckForced?: boolean): Promise<void>;
+  claimForValidator(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced?: boolean): Promise<void>;
 }
 
 

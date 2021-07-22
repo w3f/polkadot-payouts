@@ -3,7 +3,7 @@ version: 2
 jobs:
   unitTests:
     docker:
-      - image: web3f/node:v0.1.0
+      - image: web3f/node:v0.1.3
     steps:
       - checkout
       - run: yarn
@@ -14,8 +14,8 @@ jobs:
 
   e2eTests:
     docker:
-      - image: web3f/node:v0.1.0
-      - image: parity/polkadot:v0.8.27
+      - image: web3f/node:v0.1.3
+      - image: parity/polkadot:v0.9.8
         name: polkadot
         command: --chain=kusama-dev --alice --ws-port 11000 --ws-external --rpc-methods=Unsafe --rpc-cors=all
     steps:
@@ -31,7 +31,9 @@ jobs:
       - image: web3f/ci-commons:v2.4.4
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          docker_layer_caching: true
+          version: 19.03.13
       - run:
           command: |
             /scripts/build-image.sh web3f/accountant .
@@ -116,6 +118,7 @@ workflows:
           requires:
             - integrationTests
       - publishChart:
+          context: github-bot
           filters:
             branches:
               ignore: /.*/
