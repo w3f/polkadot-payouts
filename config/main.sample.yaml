@@ -1,6 +1,9 @@
 logLevel: info
 wsEndpoint: "wss://rpc.polkadot.io/"
 isDeepHistoryCheckForced: true
+gracePeriod:
+  enabled: false
+  eras: 16
 transactions:
 - sender:
     alias: sender1

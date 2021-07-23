@@ -1,6 +1,9 @@
 logLevel: info
 wsEndpoint: "wss://kusama-rpc.polkadot.io/"
 isDeepHistoryCheckForced: false
+gracePeriod:
+  enabled: false
+  eras: 16
 claimsThirdParty:
   claimerKeystore:
     filePath: /path/to/validator-000/keystore

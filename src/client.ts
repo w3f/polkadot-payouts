@@ -5,10 +5,11 @@ import {
 } from '@w3f/polkadot-api-client';
 import { StakingLedger } from '@polkadot/types/interfaces'
 import waitUntil from 'async-wait-until';
+import { GracePeriod } from './types';
 
 export class Client extends ClientW3f {
 
-  public async claim(validatorKeystore: Keystore, controllerAddress: string, isHistoryCheckForced = false): Promise<void> {
+  public async claim(validatorKeystore: Keystore, controllerAddress: string, isHistoryCheckForced = false, gracePeriod: GracePeriod = {enabled: false, eras: 0}): Promise<void> {
         if (this.apiNotReady()) {
             await this.connect();
         }
@@ -45,9 +46,12 @@ export class Client extends ClientW3f {
 
             for (let i = start; i <= txLimit + start - 1; i++) {
                 const idx = lastReward + i;
+
+                const isGracePeriodSatisfied = !gracePeriod.enabled || (  currentEra.index - idx > gracePeriod.eras )
+
                 const exposure = await this._api.query.staking.erasStakers(idx, keyPair.address);
                 this.logger.info(`exposure: ${exposure}`);
-                if (exposure.total.toBn().gt(ZeroBN)) {
+                if (exposure.total.toBn().gt(ZeroBN) && isGracePeriodSatisfied) {
                     this.logger.info(`Adding claim for ${keyPair.address}, era ${idx}`);
                     payoutCalls.push(this._api.tx.staking.payoutStakers(keyPair.address, idx));
                 }
@@ -77,7 +81,7 @@ export class Client extends ClientW3f {
         this.logger.info(`All payouts ( ${numOfClaimedPayouts} ) have been claimed for ${keyPair.address}.`);
     }
 
-    public async claimForValidator(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced = false): Promise<void> {
+    public async claimForValidator(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced = false, gracePeriod: GracePeriod = {enabled: false, eras: 0} ): Promise<void> {
       if (this.apiNotReady()) {
           await this.connect();
       }
@@ -114,8 +118,11 @@ export class Client extends ClientW3f {
 
           for (let i = start; i <= txLimit + start - 1; i++) {
               const idx = lastReward + i;
+
+              const isGracePeriodSatisfied = !gracePeriod.enabled || (  currentEra.index - idx > gracePeriod.eras )
+              
               const exposure = await this._api.query.staking.erasStakers(idx, validatorAddress);
-              if (exposure.total.toBn().gt(ZeroBN)) {
+              if (exposure.total.toBn().gt(ZeroBN) && isGracePeriodSatisfied ) {
                   this.logger.info(`Adding claim for ${validatorAddress}, era ${idx}`);
                   payoutCalls.push(this._api.tx.staking.payoutStakers(validatorAddress, idx));
               }

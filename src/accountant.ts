@@ -10,12 +10,13 @@ import {
     Transaction,
     TransactionRestriction,
     Claim,
-    ApiClient, AccountantInputConfig, ClaimsThirdParty, Target
+    ApiClient, AccountantInputConfig, ClaimsThirdParty, Target, GracePeriod
 } from './types';
 
 export class Accountant {
     private minimumSenderBalance: Balance;
     private isDeepHistoryCheckForced = false;
+    private gracePeriod: GracePeriod = {enabled: false, eras: 0};
     private transactions: Array<Transaction> = [];
     private claims: Array<Claim> = [];
     private claimsThirdParty: ClaimsThirdParty;
@@ -29,6 +30,7 @@ export class Accountant {
         if(cfg.claims) this.claims = cfg.claims    
         if(cfg.claimsThirdParty) this.claimsThirdParty = cfg.claimsThirdParty
         if(cfg.isDeepHistoryCheckForced) this.isDeepHistoryCheckForced = cfg.isDeepHistoryCheckForced
+        if(cfg.gracePeriod) this.gracePeriod = cfg.gracePeriod
     }
 
     async run(): Promise<void> {
@@ -65,11 +67,11 @@ export class Accountant {
     }
 
     private async processClaim(claim: Claim): Promise<void> {
-        return this.client.claim(claim.keystore, claim.controllerAddress, this.isDeepHistoryCheckForced);
+        return this.client.claim(claim.keystore, claim.controllerAddress, this.isDeepHistoryCheckForced, this.gracePeriod);
     }
 
     private async processClaimThirdParty(claimer: Keystore, validatorTarger: Target): Promise<void> {
-      return this.client.claimForValidator(validatorTarger.validatorAddress,claimer,this.isDeepHistoryCheckForced);
+      return this.client.claimForValidator(validatorTarger.validatorAddress,claimer,this.isDeepHistoryCheckForced, this.gracePeriod);
   }
 
     private async determineAmount(restriction: TransactionRestriction, senderKeystore: Keystore, receiverAddr: string): Promise<Balance> {

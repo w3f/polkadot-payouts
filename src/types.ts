@@ -53,6 +53,7 @@ export interface AccountantInputConfig {
     claimsThirdParty?: ClaimsThirdParty;
     minimumSenderBalance: number;
     isDeepHistoryCheckForced?: boolean;
+    gracePeriod?: GracePeriod;
 }
 
 export interface InputConfig extends AccountantInputConfig {
@@ -60,9 +61,14 @@ export interface InputConfig extends AccountantInputConfig {
   logLevel: string;
 }
 
+export interface GracePeriod {
+  enabled: boolean;
+  eras: number;
+}
+
 export interface ApiClient extends ApiClientW3f {
-  claim(controllerKeystore: Keystore, validatorStash: string, isHistoryCheckForced?: boolean): Promise<void>;
-  claimForValidator(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced?: boolean): Promise<void>;
+  claim(controllerKeystore: Keystore, validatorStash: string, isHistoryCheckForced?: boolean, gracePeriod?: GracePeriod): Promise<void>;
+  claimForValidator(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced?: boolean, gracePeriod?: GracePeriod): Promise<void>;
 }
 
 
