@@ -88,7 +88,7 @@ export class Accountant {
       
       const unclaimedPayouts = await this.client.checkOnly(target.validatorAddress)
       if(unclaimedPayouts.length>0){
-        this.logger.info(`${target.validatorAddress} has unclaimed rewards for era(s) ${unclaimedPayouts.toString()}`);
+        this.logger.info(`${target.alias} has unclaimed rewards for era(s) ${unclaimedPayouts.toString()}`);
       }
       else{
         this.logger.info(`All the payouts have been claimed for validator ${target.alias}`);
