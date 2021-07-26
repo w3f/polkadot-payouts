@@ -57,6 +57,27 @@ This block is composed by two elements:
 
 The password file should not contain any trailing new line charaters, therefore you could use this command to be sure to create a properly formatted password file: `echo -n "yourPassword" > yourFileName`
 
+# Optional - Grace Period
+This is an optional parameter you can add to configure a grace period limitation you wish to introduce: it will prevent a claim to be triggered if the validator rewards is not "old" enough eras from the current one.  
+For example, in Kusama this is equivalent to a grace period of 4 days:  
+```
+# config/main.yaml
+logLevel: info
+wsEndpoint: "wss://kusama-rpc.polkadot.io/"
+gracePeriod:
+  enabled: true
+  eras: 16
+claimsThirdParty:
+  claimerKeystore:
+    filePath: /path/to/validator-000/keystore
+    passwordPath: /path/to/validator-000/keystore/password
+  targets:
+  - alias: validator-000
+    validatorAddress: "<validator-000-stash-address>"
+  - alias: validator-001
+    validatorAddress: "<validator-001-stash-address>"  
+```
+
 # Configuration - Claim, each for himslef, and transfer to a destination wallet
 This is a typical configuration file to use the "Claim for yourself and transfer to destination wallet" feature:
 ```
