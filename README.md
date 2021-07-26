@@ -27,6 +27,7 @@ $ yarn start
 # Features
 
 - Claim for a third party
+- Check Only for missing claims
 - Claim, each for himslef
 - Transfer to a destination wallet what you have just claimed
 
@@ -77,6 +78,20 @@ claimsThirdParty:
   - alias: validator-001
     validatorAddress: "<validator-001-stash-address>"  
 ```
+
+# Configuration - Check Only for missing claims
+This is a typical configuration file to use the "Check Only for missing claims" feature:
+```
+# config/main.yaml
+logLevel: info
+wsEndpoint: "wss://kusama-rpc.polkadot.io/"
+claimsCheckOnly:
+- alias: validator-000
+  validatorAddress: "<validator-000-stash-address>"
+- alias: validator-001
+  validatorAddress: "<validator-001-stash-address>" 
+```
+You should define the RPC endpoint to use in the `wsEndpoint` field.
 
 # Configuration - Claim, each for himslef, and transfer to a destination wallet
 This is a typical configuration file to use the "Claim for yourself and transfer to destination wallet" feature:
