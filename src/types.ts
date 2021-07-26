@@ -35,7 +35,7 @@ export interface Transaction {
 export interface Claim extends CommonActor {
 }
 
-export interface ClaimsThirdParty {
+export interface ClaimThirdParty {
   claimerKeystore: Keystore;
   targets: Array<Target>;
 }
@@ -47,10 +47,11 @@ export interface Target {
 
 
 export interface AccountantInputConfig {
-    transactions: Array<Transaction>;
-    claims: Array<Claim>;
-    claimsThirdParty?: ClaimsThirdParty;
-    minimumSenderBalance: number;
+    transactions?: Array<Transaction>;
+    claims?: Array<Claim>;
+    claimThirdParty?: ClaimThirdParty;
+    claimsCheckOnly?: Array<Target>;
+    minimumSenderBalance?: number;
     isDeepHistoryCheckForced?: boolean;
     gracePeriod?: GracePeriod;
 }
@@ -68,6 +69,7 @@ export interface GracePeriod {
 export interface ApiClient extends ApiClientW3f {
   claim(validatorKeystore: Keystore, isHistoryCheckForced?: boolean, gracePeriod?: GracePeriod): Promise<void>;
   claimForValidator(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced?: boolean, gracePeriod?: GracePeriod): Promise<void>;
+  checkOnly(validatorAddress: string): Promise<number[]>;
 }
 
 
