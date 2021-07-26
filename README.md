@@ -26,11 +26,38 @@ $ yarn start
 
 # Features
 
-- Claim for yourself
 - Claim for a third party
+- Claim, each for himslef
 - Transfer to a destination wallet what you have just claimed
 
-# Configuration - Claim for yourself and transfer to a destination wallet
+# Configuration - Claim for a third party
+This is a typical configuration file to use the "Claim for a third party" feature:
+```
+# config/main.yaml
+logLevel: info
+wsEndpoint: "wss://kusama-rpc.polkadot.io/"
+claimsThirdParty:
+  claimerKeystore:
+    filePath: /path/to/validator-000/keystore
+    passwordPath: /path/to/validator-000/keystore/password
+  targets:
+  - alias: validator-000
+    validatorAddress: "<validator-000-stash-address>"
+  - alias: validator-001
+    validatorAddress: "<validator-001-stash-address>"  
+```
+You should define the RPC endpoint to use in the `wsEndpoint` field.
+
+### ClaimsThirdPary
+This block is composed by two elements:  
+- The Claimer Keystore: it includes the information about the claimer account keystore, in particular the paths to the keystore file and the password file.  
+- An array of elements/targets that describe each of the reward claims to perform. It should include information on the addresses of the validators you are willing to take care of
+
+# About - Keystore Password File
+
+The password file should not contain any trailing new line charaters, therefore you could use this command to be sure to create a properly formatted password file: `echo -n "yourPassword" > yourFileName`
+
+# Configuration - Claim, each for himslef, and transfer to a destination wallet
 This is a typical configuration file to use the "Claim for yourself and transfer to destination wallet" feature:
 ```
 # config/main.yaml
@@ -72,8 +99,8 @@ You should define the RPC endpoint to use in the `wsEndpoint` field. There are t
 for `transactions`.
 
 ### Claims
-This block is an arrray of elements that describe each of the reward claims to perform. They should include the information about the validator stash keystore, in particular the paths of the keystore file and the password file. You take special care to make these files only
-accessible by the user running the tool. Also, the password file should not contain any trailing new line charaters, therefore you could use this command to be sure to create a properly formatted password file: `echo -n "yourPassword" > yourFileName`
+This block is an array of elements that describe each of the reward claims to perform. They should include the information about the validator stash keystore, in particular the paths of the keystore file and the password file. You take special care to make these files only
+accessible by the user running the tool.
 
 ### Transactions
 Each of the transaction elements should have information about the sender and the receciver. For the sender, the keystore
@@ -81,21 +108,3 @@ information is enough. For the receiver you need to specify the address and a po
 restriction can have two different fields:
 * remaining: leave this much in the sender, send the rest
 * desired: send desired minus the receiver current balance, so that at the end the reeiver balance matches the `desired` value. If the balance of the receiver is greater than the desired vallue then no action is taken.
-
-# Configuration - Claim for a third party
-This is a typical configuration file to use the "Claim for a third party" feature:
-```
-# config/main.yaml
-logLevel: info
-wsEndpoint: "wss://kusama-rpc.polkadot.io/"
-claimsThirdParty:
-  claimerKeystore:
-    filePath: /path/to/validator-000/keystore
-    passwordPath: /path/to/validator-000/keystore/password
-  targets:
-  - alias: validator-000
-    validatorAddress: "<validator-000-stash-address>"
-  - alias: validator-001
-    validatorAddress: "<validator-001-stash-address>"  
-```
-You should define the RPC endpoint to use in the `wsEndpoint` field.
