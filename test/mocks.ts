@@ -19,4 +19,7 @@ export class ClientMock {
     }
     async claimForValidator(validatorAddress: string, claimerKeystore: Keystore): Promise<void> {
     }
+    async checkOnly(validatorAddress: string): Promise<number[]> {
+      return []
+    }
 }

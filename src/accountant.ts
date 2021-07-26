@@ -10,7 +10,7 @@ import {
     Transaction,
     TransactionRestriction,
     Claim,
-    ApiClient, AccountantInputConfig, ClaimsThirdParty, Target, GracePeriod
+    ApiClient, AccountantInputConfig, ClaimThirdParty, Target, GracePeriod
 } from './types';
 
 export class Accountant {
@@ -19,7 +19,8 @@ export class Accountant {
     private gracePeriod: GracePeriod = {enabled: false, eras: 0};
     private transactions: Array<Transaction> = [];
     private claims: Array<Claim> = [];
-    private claimsThirdParty: ClaimsThirdParty;
+    private claimThirdParty: ClaimThirdParty;
+    private claimsCheckOnly: Array<Target> = []
 
     constructor(
         cfg: AccountantInputConfig,
@@ -28,22 +29,31 @@ export class Accountant {
         this.minimumSenderBalance = new BN(cfg.minimumSenderBalance) as Balance
         if(cfg.transactions) this.transactions = cfg.transactions
         if(cfg.claims) this.claims = cfg.claims    
-        if(cfg.claimsThirdParty) this.claimsThirdParty = cfg.claimsThirdParty
+        if(cfg.claimThirdParty) this.claimThirdParty = cfg.claimThirdParty
+        if(cfg.claimsCheckOnly) this.claimsCheckOnly = cfg.claimsCheckOnly
         if(cfg.isDeepHistoryCheckForced) this.isDeepHistoryCheckForced = cfg.isDeepHistoryCheckForced
         if(cfg.gracePeriod) this.gracePeriod = cfg.gracePeriod
     }
 
     async run(): Promise<void> {
+        if(this.claimsCheckOnly.length > 0) {
+          for (let i = 0; i < this.claimsCheckOnly.length; i++) {
+            this.logger.info(`Processing checkOnlyClaim ${i} for ${this.claimsCheckOnly[i].alias}`);
+            await this.processClaimCheckOnly(this.claimsCheckOnly[i]);
+          }
+          this.client.disconnect();
+          return
+        }
         if (this.claims.length > 0) {
             for (let i = 0; i < this.claims.length; i++) {
                 this.logger.info(`Processing claim ${i} for ${this.claims[i].alias}`);
                 await this.processClaim(this.claims[i]);
             }
         }
-        if (this.claimsThirdParty?.targets.length > 0) {
-          for (let i = 0; i < this.claimsThirdParty.targets.length; i++) {
-              this.logger.info(`Processing third party claim ${i} for ${this.claimsThirdParty.targets[i].alias}`);
-              await this.processClaimThirdParty(this.claimsThirdParty.claimerKeystore,this.claimsThirdParty.targets[i]);
+        if (this.claimThirdParty?.targets.length > 0) {
+          for (let i = 0; i < this.claimThirdParty.targets.length; i++) {
+              this.logger.info(`Processing third party claim ${i} for ${this.claimThirdParty.targets[i].alias}`);
+              await this.processClaimThirdParty(this.claimThirdParty.claimerKeystore,this.claimThirdParty.targets[i]);
           }
         } 
         if (this.transactions.length > 0) {
@@ -70,9 +80,21 @@ export class Accountant {
         return this.client.claim(claim.keystore, this.isDeepHistoryCheckForced, this.gracePeriod);
     }
 
-    private async processClaimThirdParty(claimer: Keystore, validatorTarger: Target): Promise<void> {
-      return this.client.claimForValidator(validatorTarger.validatorAddress,claimer,this.isDeepHistoryCheckForced, this.gracePeriod);
-  }
+    private async processClaimThirdParty(claimer: Keystore, validatorTarget: Target): Promise<void> {
+      return this.client.claimForValidator(validatorTarget.validatorAddress,claimer,this.isDeepHistoryCheckForced, this.gracePeriod);
+    }
+    
+    private async processClaimCheckOnly(target: Target): Promise<void> {
+      
+      const unclaimedPayouts = await this.client.checkOnly(target.validatorAddress)
+      if(unclaimedPayouts.length>0){
+        this.logger.info(`${target.validatorAddress} has unclaimed rewards for era(s) ${unclaimedPayouts.toString()}`);
+      }
+      else{
+        this.logger.info(`All the payouts have been claimed for validator ${target.alias}`);
+      }
+
+    }
 
     private async determineAmount(restriction: TransactionRestriction, senderKeystore: Keystore, receiverAddr: string): Promise<Balance> {
         if (restriction.desired &&

@@ -4,7 +4,7 @@ isDeepHistoryCheckForced: false
 gracePeriod:
   enabled: false
   eras: 16
-claimsThirdParty:
+claimThirdParty:
   claimerKeystore:
     filePath: /path/to/validator-000/keystore
     passwordPath: /path/to/validator-000/keystore/password

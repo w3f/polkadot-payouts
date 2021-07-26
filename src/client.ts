@@ -30,17 +30,7 @@ export class Client extends ClientW3f {
         throw new Error('Could not get current era');
     }
 
-    const ledger = (await this._api.derive.staking.account(validatorAddress)).stakingLedger
-
-    if (!ledger) {
-        throw new Error(`Could not get ledger for ${validatorAddress}`);
-    }
-    let lastReward: number;
-    if ( isHistoryCheckForced || ledger.claimedRewards.length == 0 ) {
-        lastReward = (await this._api.query.staking.historyDepth()).toNumber();
-    } else {
-        lastReward = ledger.claimedRewards.pop().toNumber();
-    }
+    const lastReward = await this.getLastReward(validatorAddress,isHistoryCheckForced)
 
     let numOfUnclaimPayouts = currentEra.index - lastReward - 1;
     let start = 1;
@@ -86,7 +76,50 @@ export class Client extends ClientW3f {
         start += txLimit;
     }
     this.logger.info(`All payouts ( ${numOfClaimedPayouts} ) have been claimed for ${validatorAddress}.`);
-}
+  }
+
+  public async checkOnly(validatorAddress: string ): Promise<number[]> {
+    if (this.apiNotReady()) {
+        await this.connect();
+    }
+
+    const currentEra = (await this._api.query.staking.activeEra()).unwrapOr(null);
+    if (!currentEra) {
+        throw new Error('Could not get current era');
+    }
+
+    const lastReward = await this.getLastReward(validatorAddress)
+
+    const numOfPotentialUnclaimedPayouts = currentEra.index - lastReward - 1;
+    const unclaimedPayouts = []
+    for ( let i = 1; i <= numOfPotentialUnclaimedPayouts; i++) {
+
+      const idx = lastReward + i;
+      const exposure = await this._api.query.staking.erasStakers(idx, validatorAddress);
+      if (exposure.total.toBn().gt(ZeroBN)) {
+        unclaimedPayouts.push(idx)
+      }
+    }
+
+    return unclaimedPayouts    
+  }
+
+  async getLastReward(validatorAddress: string, isHistoryCheckForced = false): Promise<number> {
+
+    const ledger = (await this._api.derive.staking.account(validatorAddress)).stakingLedger
+
+    if (!ledger) {
+        throw new Error(`Could not get ledger for ${validatorAddress}`);
+    }
+    let lastReward: number;
+    if ( isHistoryCheckForced || ledger.claimedRewards.length == 0 ) {
+        lastReward = (await this._api.query.staking.historyDepth()).toNumber();
+    } else {
+        lastReward = ledger.claimedRewards.pop().toNumber();
+    }
+
+    return lastReward
+  }
 
 }
 
