@@ -37,7 +37,7 @@ describe('Client', () => {
         fs.writeSync(passFile.fd, pass);
         const ks: Keystore = { filePath: ksFile.name, passwordPath: passFile.name };
 
-        await subject.claim(ks, alice.address);
+        await subject.claim(ks);
     });
 
 });

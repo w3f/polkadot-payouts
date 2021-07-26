@@ -15,7 +15,7 @@ export class ClientMock {
         return;
     }
     disconnect(): void { }
-    async claim(keystore: Keystore, address: string): Promise<void> {
+    async claim(validatorKeystore: Keystore): Promise<void> {
     }
     async claimForValidator(validatorAddress: string, claimerKeystore: Keystore): Promise<void> {
     }

@@ -33,7 +33,6 @@ export interface Transaction {
 }
 
 export interface Claim extends CommonActor {
-    controllerAddress: string;
 }
 
 export interface ClaimsThirdParty {
@@ -53,6 +52,7 @@ export interface AccountantInputConfig {
     claimsThirdParty?: ClaimsThirdParty;
     minimumSenderBalance: number;
     isDeepHistoryCheckForced?: boolean;
+    gracePeriod?: GracePeriod;
 }
 
 export interface InputConfig extends AccountantInputConfig {
@@ -60,9 +60,14 @@ export interface InputConfig extends AccountantInputConfig {
   logLevel: string;
 }
 
+export interface GracePeriod {
+  enabled: boolean;
+  eras: number;
+}
+
 export interface ApiClient extends ApiClientW3f {
-  claim(controllerKeystore: Keystore, validatorStash: string, isHistoryCheckForced?: boolean): Promise<void>;
-  claimForValidator(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced?: boolean): Promise<void>;
+  claim(validatorKeystore: Keystore, isHistoryCheckForced?: boolean, gracePeriod?: GracePeriod): Promise<void>;
+  claimForValidator(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced?: boolean, gracePeriod?: GracePeriod): Promise<void>;
 }
 
 

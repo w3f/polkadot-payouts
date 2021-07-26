@@ -1,6 +1,9 @@
 logLevel: info
 wsEndpoint: "wss://rpc.polkadot.io/"
 isDeepHistoryCheckForced: true
+gracePeriod:
+  enabled: false
+  eras: 4
 transactions:
 - sender:
     alias: sender1
@@ -24,12 +27,10 @@ transactions:
     desired: 10000000000000 # send desired - current_receiver_balance, if current_receiver_balance >= desired noop
 claims:
 - alias: stash1
-  controllerAddress: 5DwAurocRcvfdozAuyojRwYVy9k7h8yekrrBKaDdfEhN13sJ
   keystore:
     filePath: /stash1/keystore/data.json
     passwordPath: /stash1/keystore/password.txt
 - alias: stash2
-  controllerAddress: 5F7dw2gF9DfGoBVdaWfv8ZLTZHrj8wQ7JeSGsPFp7yNkuNdy
   keystore:
     filePath: /stash2/keystore/path/
     passwordPath: /stash2/keystore/password.txt
