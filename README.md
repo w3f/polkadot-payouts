@@ -39,12 +39,10 @@ wsEndpoint: "wss://kusama-rpc.polkadot.io/"
 minimumSenderBalance: 100000000000 # bellow this value transfers are not sent by the tool
 claims:
 - alias: validator-000
-  controllerAddress: "<validator-000-controller-address>"
   keystore:
     filePath: /path/to/validator-000/keystore
     passwordPath: /path/to/validator-000/keystore/password
 - alias: validator-001
-  controllerAddress: "<validator-001-controller-address>"
   keystore:
     filePath: /path/to/validator-001/keystore
     passwordPath: /path/to/validator-001/keystore/password
@@ -74,10 +72,8 @@ You should define the RPC endpoint to use in the `wsEndpoint` field. There are t
 for `transactions`.
 
 ### Claims
-This block is an arrray of elements that describe each of the reward claims to perform. They should include the address
-of the controller account of the validator and information about the validator stash keystore, the path of the keystore
-file and the path of a file containing the password of the keystore. You take special ccare to make this files only
-accessible by the user running the tool.
+This block is an arrray of elements that describe each of the reward claims to perform. They should include the information about the validator stash keystore, in particular the paths of the keystore file and the password file. You take special care to make these files only
+accessible by the user running the tool. Also, the password file should not contain any trailing new line charaters, therefore you could use this command to be sure to create a properly formatted password file: `echo -n "yourPassword" > yourFileName`
 
 ### Transactions
 Each of the transaction elements should have information about the sender and the receciver. For the sender, the keystore
