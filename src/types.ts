@@ -33,7 +33,6 @@ export interface Transaction {
 }
 
 export interface Claim extends CommonActor {
-    controllerAddress: string;
 }
 
 export interface ClaimsThirdParty {
@@ -67,7 +66,7 @@ export interface GracePeriod {
 }
 
 export interface ApiClient extends ApiClientW3f {
-  claim(controllerKeystore: Keystore, validatorStash: string, isHistoryCheckForced?: boolean, gracePeriod?: GracePeriod): Promise<void>;
+  claim(validatorKeystore: Keystore, isHistoryCheckForced?: boolean, gracePeriod?: GracePeriod): Promise<void>;
   claimForValidator(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced?: boolean, gracePeriod?: GracePeriod): Promise<void>;
 }
 

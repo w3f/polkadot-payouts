@@ -67,7 +67,7 @@ export class Accountant {
     }
 
     private async processClaim(claim: Claim): Promise<void> {
-        return this.client.claim(claim.keystore, claim.controllerAddress, this.isDeepHistoryCheckForced, this.gracePeriod);
+        return this.client.claim(claim.keystore, this.isDeepHistoryCheckForced, this.gracePeriod);
     }
 
     private async processClaimThirdParty(claimer: Keystore, validatorTarger: Target): Promise<void> {
