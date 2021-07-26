@@ -18,7 +18,7 @@ Then you should create a configuration file, you can start by copying a sample p
 ```
 $ cp config/main.sample.yaml config/main.yaml
 ```
-Now you can customize `config/main.yaml`, see [Configuration](#configuration) about how to do it. Once you are done you
+Now you can customize `config/main.yaml`, see the following configurations about how to do it. Once you are done you
 can run the tool with:
 ```
 $ yarn start
