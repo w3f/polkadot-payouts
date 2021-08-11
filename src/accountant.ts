@@ -77,11 +77,14 @@ export class Accountant {
     }
 
     private async processClaim(claim: Claim): Promise<void> {
-        return this.client.claim(claim.keystore, this.isDeepHistoryCheckForced, this.gracePeriod);
+
+      const numOfClaimedPayouts = this.client.claim(claim.keystore, this.isDeepHistoryCheckForced, this.gracePeriod);
+      this.logger.info(`All payouts ( ${numOfClaimedPayouts} ) have been claimed for ${claim.alias}.`);
     }
 
     private async processClaimThirdParty(claimer: Keystore, validatorTarget: Target): Promise<void> {
-      return this.client.claimForValidator(validatorTarget.validatorAddress,claimer,this.isDeepHistoryCheckForced, this.gracePeriod);
+      const numOfClaimedPayouts = this.client.claimForValidator(validatorTarget.validatorAddress,claimer,this.isDeepHistoryCheckForced, this.gracePeriod);
+      this.logger.info(`All payouts ( ${numOfClaimedPayouts} ) have been claimed for ${validatorTarget.alias}.`);
     }
     
     private async processClaimCheckOnly(target: Target): Promise<void> {

@@ -67,8 +67,8 @@ export interface GracePeriod {
 }
 
 export interface ApiClient extends ApiClientW3f {
-  claim(validatorKeystore: Keystore, isHistoryCheckForced?: boolean, gracePeriod?: GracePeriod): Promise<void>;
-  claimForValidator(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced?: boolean, gracePeriod?: GracePeriod): Promise<void>;
+  claim(validatorKeystore: Keystore, isHistoryCheckForced?: boolean, gracePeriod?: GracePeriod): Promise<number>;
+  claimForValidator(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced?: boolean, gracePeriod?: GracePeriod): Promise<number>;
   checkOnly(validatorAddress: string): Promise<number[]>;
 }
 

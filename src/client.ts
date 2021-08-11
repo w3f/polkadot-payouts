@@ -8,16 +8,16 @@ import { GracePeriod } from './types';
 
 export class Client extends ClientW3f {
 
-  public async claim(validatorKeystore: Keystore, isHistoryCheckForced = false, gracePeriod: GracePeriod = {enabled: false, eras: 0}): Promise<void> {
+  public async claim(validatorKeystore: Keystore, isHistoryCheckForced = false, gracePeriod: GracePeriod = {enabled: false, eras: 0}): Promise<number> {
     const keyPair = this.getKeyPair(validatorKeystore);
-    await this.claimGeneral(keyPair.address,validatorKeystore,isHistoryCheckForced,gracePeriod)
+    return await this.claimGeneral(keyPair.address,validatorKeystore,isHistoryCheckForced,gracePeriod)
   }
 
-  public async claimForValidator(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced = false, gracePeriod: GracePeriod = {enabled: false, eras: 0} ): Promise<void> {
-    await this.claimGeneral(validatorAddress,claimerKeystore,isHistoryCheckForced,gracePeriod)
+  public async claimForValidator(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced = false, gracePeriod: GracePeriod = {enabled: false, eras: 0} ): Promise<number> {
+    return await this.claimGeneral(validatorAddress,claimerKeystore,isHistoryCheckForced,gracePeriod)
   }
 
-  async claimGeneral(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced = false, gracePeriod: GracePeriod = {enabled: false, eras: 0} ): Promise<void> {
+  async claimGeneral(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced = false, gracePeriod: GracePeriod = {enabled: false, eras: 0} ): Promise<number> {
     if (this.apiNotReady()) {
         await this.connect();
     }
@@ -75,7 +75,8 @@ export class Client extends ClientW3f {
         numOfUnclaimPayouts -= txLimit;
         start += txLimit;
     }
-    this.logger.info(`All payouts ( ${numOfClaimedPayouts} ) have been claimed for ${validatorAddress}.`);
+    //this.logger.info(`All payouts ( ${numOfClaimedPayouts} ) have been claimed for ${validatorAddress}.`);
+    return numOfClaimedPayouts
   }
 
   public async checkOnly(validatorAddress: string ): Promise<number[]> {
