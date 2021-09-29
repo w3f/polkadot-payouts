@@ -2,7 +2,7 @@ environment: production
 
 image:
   repo: web3f/accountant
-  tag: v0.4.4
+  tag: v0.4.5
 
 schedule: "*/15 * * * *"
 

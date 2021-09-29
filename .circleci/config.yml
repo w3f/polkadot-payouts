@@ -26,21 +26,29 @@ jobs:
           command: |
             yarn e2e-test
 
+  yarnLint:
+    docker:
+      - image: web3f/node-dind:v1.0.0
+    steps:
+      - checkout
+      - run: yarn
+      - run: yarn lint          
+
   buildImage:
     docker:
-      - image: web3f/ci-commons:v2.4.4
+      - image: web3f/ci-commons:v2.4.6
     steps:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
-          version: 19.03.13
+          version: 20.10.7
       - run:
           command: |
             /scripts/build-image.sh web3f/accountant .
 
   helmLint:
     docker:
-      - image: web3f/ci-commons:v2.4.4
+      - image: web3f/ci-commons:v2.4.6
     steps:
       - checkout
       - run:
@@ -49,7 +57,7 @@ jobs:
 
   integrationTests:
     docker:
-      - image: web3f/ci-commons:v2.4.4
+      - image: web3f/ci-commons:v2.4.6
     steps:
       - checkout
       - setup_remote_docker
@@ -60,7 +68,7 @@ jobs:
 
   publishImage:
     docker:
-      - image: web3f/ci-commons:v2.4.4
+      - image: web3f/ci-commons:v2.4.6
     steps:
       - checkout
       - setup_remote_docker
@@ -70,7 +78,7 @@ jobs:
 
   publishChart:
     docker:
-      - image: web3f/ci-commons:v2.4.4
+      - image: web3f/ci-commons:v2.4.6
     steps:
       - checkout
       - run:
@@ -85,14 +93,24 @@ workflows:
           filters:
             tags:
               only: /.*/
+          requires:
+            - yarnLint
+            - helmLint     
       - e2eTests:
           filters:
             tags:
               only: /.*/
+          requires:
+            - yarnLint
+            - helmLint   
       - helmLint:
           filters:
             tags:
               only: /.*/
+      - yarnLint:
+          filters:
+            tags:
+              only: /.*/        
       - buildImage:
           context: dockerhub-bot
           filters:
@@ -107,7 +125,6 @@ workflows:
               only: /.*/
           requires:
             - buildImage
-            - helmLint
       - publishImage:
           context: dockerhub-bot
           filters:
