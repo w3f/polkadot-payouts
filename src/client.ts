@@ -17,10 +17,44 @@ export class Client extends ClientW3f {
     await this.claimGeneral(validatorAddress,claimerKeystore,isHistoryCheckForced,gracePeriod)
   }
 
-  async claimGeneral(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced = false, gracePeriod: GracePeriod = {enabled: false, eras: 0} ): Promise<void> {
-    if (this.apiNotReady()) {
-        await this.connect();
+  public async checkOnly(validatorAddress: string ): Promise<number[]> {
+    await this.handleConnection()
+
+    const currentEra = (await this._api.query.staking.activeEra()).unwrapOr(null);
+    if (!currentEra) {
+        throw new Error('Could not get current era');
     }
+
+    const lastReward = await this.getLastReward(validatorAddress)
+
+    const numOfPotentialUnclaimedPayouts = currentEra.index - lastReward - 1;
+    const unclaimedPayouts = []
+    for ( let i = 1; i <= numOfPotentialUnclaimedPayouts; i++) {
+
+      const idx = lastReward + i;
+      const exposure = await this._api.query.staking.erasStakers(idx, validatorAddress);
+      if (exposure.total.toBn().gt(ZeroBN)) {
+        unclaimedPayouts.push(idx)
+      }
+    }
+
+    return unclaimedPayouts    
+  }
+
+  private async handleConnection(): Promise<void> {
+    if(this.apiNotReady() ) { //if not init
+      this.logger.debug('init the api')
+      await this.connect(); //init
+    }
+    if(!this._api.isConnected){
+      this.logger.info("Trying to reconnect...")
+      await this._api.disconnect();
+      await this.connect();
+    }
+  }
+
+  private async claimGeneral(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced = false, gracePeriod: GracePeriod = {enabled: false, eras: 0} ): Promise<void> {
+    await this.handleConnection()
 
     const maxBatchedTransactions = 9;
     const keyPair = this.getKeyPair(claimerKeystore);
@@ -78,33 +112,7 @@ export class Client extends ClientW3f {
     this.logger.info(`All payouts ( ${numOfClaimedPayouts} ) have been claimed for ${validatorAddress}.`);
   }
 
-  public async checkOnly(validatorAddress: string ): Promise<number[]> {
-    if (this.apiNotReady()) {
-        await this.connect();
-    }
-
-    const currentEra = (await this._api.query.staking.activeEra()).unwrapOr(null);
-    if (!currentEra) {
-        throw new Error('Could not get current era');
-    }
-
-    const lastReward = await this.getLastReward(validatorAddress)
-
-    const numOfPotentialUnclaimedPayouts = currentEra.index - lastReward - 1;
-    const unclaimedPayouts = []
-    for ( let i = 1; i <= numOfPotentialUnclaimedPayouts; i++) {
-
-      const idx = lastReward + i;
-      const exposure = await this._api.query.staking.erasStakers(idx, validatorAddress);
-      if (exposure.total.toBn().gt(ZeroBN)) {
-        unclaimedPayouts.push(idx)
-      }
-    }
-
-    return unclaimedPayouts    
-  }
-
-  async getLastReward(validatorAddress: string, isHistoryCheckForced = false): Promise<number> {
+  private async getLastReward(validatorAddress: string, isHistoryCheckForced = false): Promise<number> {
 
     const ledger = (await this._api.derive.staking.account(validatorAddress)).stakingLedger
 

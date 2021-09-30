@@ -17,6 +17,7 @@ export async function startAction(cmd): Promise<void> {
 
     try {
         await accountant.run();
+        process.exit(0);
     } catch (e) {
         logger.error(`During accountant run: ${e.toString()}`);
         process.exit(-1);

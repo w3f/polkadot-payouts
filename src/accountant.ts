@@ -12,6 +12,7 @@ import {
     Claim,
     ApiClient, AccountantInputConfig, ClaimThirdParty, Target, GracePeriod
 } from './types';
+import { getErrorMessage } from './utils';
 
 export class Accountant {
     private minimumSenderBalance: Balance;
@@ -77,23 +78,48 @@ export class Accountant {
     }
 
     private async processClaim(claim: Claim): Promise<void> {
-        return this.client.claim(claim.keystore, this.isDeepHistoryCheckForced, this.gracePeriod);
+        try {
+          await this.client.claim(claim.keystore, this.isDeepHistoryCheckForced, this.gracePeriod);
+        } catch (error: unknown) {
+          this.logger.error(`Could not process the claim for ${claim.alias}: ${error}`);
+          const message = getErrorMessage(error)
+          if(message.includes('Connection dropped') || message.includes('ECONNRESET')){
+            this.logger.warn(`Retrying...`)
+            await this.processClaim(claim)
+          }
+        }
     }
 
     private async processClaimThirdParty(claimer: Keystore, validatorTarget: Target): Promise<void> {
-      return this.client.claimForValidator(validatorTarget.validatorAddress,claimer,this.isDeepHistoryCheckForced, this.gracePeriod);
+      try {
+        await this.client.claimForValidator(validatorTarget.validatorAddress,claimer,this.isDeepHistoryCheckForced, this.gracePeriod);
+      } catch (error) {
+        this.logger.error(`Could not process the claim for ${validatorTarget.alias}: ${error}`);
+        const message = getErrorMessage(error)
+        if(message.includes('Connection dropped') || message.includes('ECONNRESET')){
+          this.logger.warn(`Retrying...`)
+          await this.processClaimThirdParty(claimer,validatorTarget)
+        }
+      }
     }
     
     private async processClaimCheckOnly(target: Target): Promise<void> {
-      
-      const unclaimedPayouts = await this.client.checkOnly(target.validatorAddress)
-      if(unclaimedPayouts.length>0){
-        this.logger.info(`${target.alias} has unclaimed rewards for era(s) ${unclaimedPayouts.toString()}`);
+      try {
+        const unclaimedPayouts = await this.client.checkOnly(target.validatorAddress)
+        if(unclaimedPayouts.length>0){
+          this.logger.info(`${target.alias} has unclaimed rewards for era(s) ${unclaimedPayouts.toString()}`);
+        }
+        else{
+          this.logger.info(`All the payouts have been claimed for validator ${target.alias}`);
+        }
+      } catch (error) {
+        this.logger.error(`Could not process the claim for ${target.alias}: ${error}`);
+        const message = getErrorMessage(error)
+        if(message.includes('Connection dropped') || message.includes('ECONNRESET')){
+          this.logger.warn(`Retrying...`)
+          await this.processClaimCheckOnly(target)
+        }
       }
-      else{
-        this.logger.info(`All the payouts have been claimed for validator ${target.alias}`);
-      }
-
     }
 
     private async determineAmount(restriction: TransactionRestriction, senderKeystore: Keystore, receiverAddr: string): Promise<Balance> {
