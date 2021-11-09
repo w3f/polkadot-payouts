@@ -36,7 +36,7 @@ jobs:
 
   buildImage:
     docker:
-      - image: web3f/ci-commons:v2.4.6
+      - image: web3f/ci-commons:v2.4.8
     steps:
       - checkout
       - setup_remote_docker:
@@ -48,7 +48,7 @@ jobs:
 
   helmLint:
     docker:
-      - image: web3f/ci-commons:v2.4.6
+      - image: web3f/ci-commons:v2.4.8
     steps:
       - checkout
       - run:
@@ -57,7 +57,7 @@ jobs:
 
   integrationTests:
     docker:
-      - image: web3f/ci-commons:v2.4.6
+      - image: web3f/ci-commons:v2.4.8
     steps:
       - checkout
       - setup_remote_docker
@@ -68,7 +68,7 @@ jobs:
 
   publishImage:
     docker:
-      - image: web3f/ci-commons:v2.4.6
+      - image: web3f/ci-commons:v2.4.8
     steps:
       - checkout
       - setup_remote_docker
@@ -78,7 +78,7 @@ jobs:
 
   publishChart:
     docker:
-      - image: web3f/ci-commons:v2.4.6
+      - image: web3f/ci-commons:v2.4.8
     steps:
       - checkout
       - run:
