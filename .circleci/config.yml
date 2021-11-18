@@ -36,7 +36,7 @@ jobs:
 
   buildImage:
     docker:
-      - image: web3f/ci-commons:v2.4.6
+      - image: web3f/ci-commons:v2.4.8
     steps:
       - checkout
       - setup_remote_docker:
@@ -48,7 +48,7 @@ jobs:
 
   helmLint:
     docker:
-      - image: web3f/ci-commons:v2.4.6
+      - image: web3f/ci-commons:v2.4.8
     steps:
       - checkout
       - run:
@@ -57,18 +57,18 @@ jobs:
 
   integrationTests:
     docker:
-      - image: web3f/ci-commons:v2.4.6
+      - image: web3f/ci-commons:v2.4.8
     steps:
       - checkout
       - setup_remote_docker
       - run:
           description: run integration tests
           command: |
-            /scripts/integration-tests.sh kindest/node:v1.19.11
+            /scripts/integration-tests.sh kindest/node:v1.21.1
 
   publishImage:
     docker:
-      - image: web3f/ci-commons:v2.4.6
+      - image: web3f/ci-commons:v2.4.8
     steps:
       - checkout
       - setup_remote_docker
@@ -78,7 +78,7 @@ jobs:
 
   publishChart:
     docker:
-      - image: web3f/ci-commons:v2.4.6
+      - image: web3f/ci-commons:v2.4.8
     steps:
       - checkout
       - run:
