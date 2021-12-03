@@ -120,7 +120,7 @@ export class Accountant {
         if(message.includes('Connection dropped') || message.includes('ECONNRESET')){
           this.logger.warn(`Retrying...`)
           await this.processClaimCheckOnly(target)
-        } 
+        }
       }
     }
 
