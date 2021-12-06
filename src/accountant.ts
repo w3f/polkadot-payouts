@@ -102,7 +102,7 @@ export class Accountant {
     private async processClaimsThirdPartyParallel(): Promise<void> {
       const parallelExecutionConfig = this.claimThirdParty.parallelExecution
 
-      //A degree of parallelism too big could make crush the API => Chunk splitting
+      //A degree of parallelism too big could make the API crush => Chunk splitting
       const degree = parallelExecutionConfig?.degree
       const targetsChunks: Target[][] = []
       for (let i = 0; i < this.claimThirdParty.targets.length; i += degree) {
