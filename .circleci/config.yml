@@ -46,26 +46,6 @@ jobs:
           command: |
             /scripts/build-image.sh web3f/accountant .
 
-  helmLint:
-    docker:
-      - image: web3f/ci-commons:v2.4.8
-    steps:
-      - checkout
-      - run:
-          command: |
-            helm lint ./charts/accountant
-
-  integrationTests:
-    docker:
-      - image: web3f/ci-commons:v2.4.8
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run:
-          description: run integration tests
-          command: |
-            /scripts/integration-tests.sh kindest/node:v1.21.1
-
   publishImage:
     docker:
       - image: web3f/ci-commons:v2.4.8
@@ -76,15 +56,6 @@ jobs:
           command: |
             /scripts/publish-image.sh web3f/accountant
 
-  publishChart:
-    docker:
-      - image: web3f/ci-commons:v2.4.8
-    steps:
-      - checkout
-      - run:
-          command: |
-            /scripts/publish-chart.sh
-
 workflows:
   version: 2
   test_and_deploy:
@@ -94,19 +65,13 @@ workflows:
             tags:
               only: /.*/
           requires:
-            - yarnLint
-            - helmLint     
+            - yarnLint  
       - e2eTests:
           filters:
             tags:
               only: /.*/
           requires:
             - yarnLint
-            - helmLint   
-      - helmLint:
-          filters:
-            tags:
-              only: /.*/
       - yarnLint:
           filters:
             tags:
@@ -119,12 +84,6 @@ workflows:
           requires:
             - unitTests
             - e2eTests
-      - integrationTests:
-          filters:
-            tags:
-              only: /.*/
-          requires:
-            - buildImage
       - publishImage:
           context: dockerhub-bot
           filters:
@@ -133,13 +92,4 @@ workflows:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
           requires:
-            - integrationTests
-      - publishChart:
-          context: github-bot
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /v[0-9]+(\.[0-9]+)*/
-          requires:
-            - integrationTests
+            - buildImage

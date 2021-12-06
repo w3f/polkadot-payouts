@@ -52,10 +52,12 @@ export class Accountant {
             }
         }
         if (this.claimThirdParty?.targets.length > 0) {
+          const promiseArray = []
           for (let i = 0; i < this.claimThirdParty.targets.length; i++) {
               this.logger.info(`Processing third party claim ${i} for ${this.claimThirdParty.targets[i].alias}`);
-              await this.processClaimThirdParty(this.claimThirdParty.claimerKeystore,this.claimThirdParty.targets[i]);
+              promiseArray.push(this.processClaimThirdParty(this.claimThirdParty.claimerKeystore,this.claimThirdParty.targets[i]));
           }
+          await Promise.all(promiseArray)
         } 
         if (this.transactions.length > 0) {
             for (let i = 0; i < this.transactions.length; i++) {

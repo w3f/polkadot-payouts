@@ -24,6 +24,10 @@ can run the tool with:
 $ yarn start
 ```
 
+# Helm Chart
+
+A helm chart for a deployment on Kubernetes could be found [here](https://github.com/w3f/polkadot-k8s-payouts)
+
 # Features
 
 - Claim for a third party
