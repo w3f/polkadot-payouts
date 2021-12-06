@@ -12,7 +12,7 @@ import {
     Claim,
     ApiClient, AccountantInputConfig, ClaimThirdParty, Target, GracePeriod
 } from './types';
-import { getErrorMessage } from './utils';
+import { delay, getErrorMessage } from './utils';
 
 export class Accountant {
     private minimumSenderBalance: Balance;
@@ -73,18 +73,12 @@ export class Accountant {
     }
 
     private async processClaim(claim: Claim): Promise<void> {
-        try {
-          await this.client.claim(claim.keystore, this.isDeepHistoryCheckForced, this.gracePeriod);
-        } catch (error: unknown) {
-          this.logger.error(`Could not process the claim for ${claim.alias}: ${error}`);
-          const message = getErrorMessage(error)
-          if(message.includes('Connection dropped') || message.includes('ECONNRESET')){
-            this.logger.warn(`Retrying...`)
-            await this.processClaim(claim)
-          }else{
-            throw error
-          }
-        }
+      await this.handleConnectionRetries(
+        async () => {
+          await this.client.claim(claim.keystore, this.isDeepHistoryCheckForced, this.gracePeriod)
+        },
+        claim.alias
+      )
     }
 
     private async processClaimsThirdParty(): Promise<void> {
@@ -97,18 +91,12 @@ export class Accountant {
     }
 
     private async processClaimThirdParty(claimer: Keystore, validatorTarget: Target): Promise<void> {
-      try {
-        await this.client.claimForValidator(validatorTarget.validatorAddress,claimer,this.isDeepHistoryCheckForced, this.gracePeriod);
-      } catch (error) {
-        this.logger.error(`Could not process the claim for ${validatorTarget.alias}: ${error}`);
-        const message = getErrorMessage(error)
-        if(message.includes('Connection dropped') || message.includes('ECONNRESET')){
-          this.logger.warn(`Retrying...`)
-          await this.processClaimThirdParty(claimer,validatorTarget)
-        }else{
-          throw error
-        }
-      }
+      await this.handleConnectionRetries(
+        async () => {
+          await this.client.claimForValidator(validatorTarget.validatorAddress,claimer,this.isDeepHistoryCheckForced, this.gracePeriod);
+        },
+        validatorTarget.alias
+      )
     }
     
     private async processClaimsCheckOnly(): Promise<void> {
@@ -119,24 +107,12 @@ export class Accountant {
     }
 
     private async processClaimCheckOnly(target: Target): Promise<void> {
-      try {
-        const unclaimedPayouts = await this.client.checkOnly(target.validatorAddress)
-        if(unclaimedPayouts.length>0){
-          this.logger.info(`${target.alias} has unclaimed rewards for era(s) ${unclaimedPayouts.toString()}`);
-        }
-        else{
-          this.logger.info(`All the payouts have been claimed for validator ${target.alias}`);
-        }
-      } catch (error) {
-        this.logger.error(`Could not process the claim for ${target.alias}: ${error}`);
-        const message = getErrorMessage(error)
-        if(message.includes('Connection dropped') || message.includes('ECONNRESET')){
-          this.logger.warn(`Retrying...`)
-          await this.processClaimCheckOnly(target)
-        }else{
-          throw error
-        }
-      }
+      await this.handleConnectionRetries(
+        async () => {
+          await this.client.checkOnly(target.validatorAddress)
+        },
+        target.validatorAddress
+      )
     }
 
     private async processTransfers(): Promise<void> {
@@ -156,6 +132,37 @@ export class Accountant {
 
         return this.client.send(tx.sender.keystore, tx.receiver.address, amount);
     }
+
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
+    private async handleConnectionRetries(f: { (): any },alias: string): Promise<void> {
+      let attempts = 0
+      const maxAttempts = 5
+      for(;;){
+        try {
+          //function
+          await f()
+          return
+        } catch (error) {
+          this.logger.error(`Could not process the claim for ${alias}: ${error}`);
+          const message = getErrorMessage(error)
+          if(
+            (
+              message.includes('Connection dropped') || 
+              message.includes('ECONNRESET') || 
+              message.includes('WebSocket is not connected')
+              ) && 
+            ++attempts < maxAttempts
+            ){
+            this.logger.warn(`Retrying...`)
+            await delay(10000) //wait x seconds before retrying
+          }
+          else{
+            throw error
+          }
+        }
+      }
+    }
+    /* eslint-enable  @typescript-eslint/no-explicit-any */
 
     private async determineAmount(restriction: TransactionRestriction, senderKeystore: Keystore, receiverAddr: string): Promise<Balance> {
         if (restriction.desired &&
