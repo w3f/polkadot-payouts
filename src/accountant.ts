@@ -60,7 +60,10 @@ export class Accountant {
     }
 
     private async initClient(): Promise<void> {
-      await this.client.api()
+      let timer: NodeJS.Timeout
+      const timeoutPromise = new Promise( (_resolve, reject) => timer=setTimeout(()=>reject(`Initial connection timed out, ws endpoint may be misconfigured`), 30000) )
+      const apiPromise = this.client.api()
+      await Promise.race([apiPromise,timeoutPromise]).finally(()=>clearTimeout(timer))
     }
 
     private async processClaims(): Promise<void> {
