@@ -42,8 +42,6 @@ export class Accountant {
         if(this.claimsCheckOnly.length > 0) {
           this.logger.info(`Processing claims checking them only...`)
           await this.processClaimsCheckOnly()
-          this.client.disconnect();
-          return
         }
         if (this.claims.length > 0) {
           this.logger.info(`Processing claims...`)
