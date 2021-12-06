@@ -26,7 +26,7 @@ $ yarn start
 
 # Helm Chart
 
-An helm chart for a deployment on Kubernetes could be found [here](https://github.com/w3f/polkadot-k8s-payouts)
+A helm chart for a deployment on Kubernetes could be found [here](https://github.com/w3f/polkadot-k8s-payouts)
 
 # Features
 
