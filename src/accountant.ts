@@ -37,46 +37,39 @@ export class Accountant {
     }
 
     async run(): Promise<void> {
+        await this.initClient()
+
         if(this.claimsCheckOnly.length > 0) {
-          for (let i = 0; i < this.claimsCheckOnly.length; i++) {
-            this.logger.info(`Processing checkOnlyClaim ${i} for ${this.claimsCheckOnly[i].alias}`);
-            await this.processClaimCheckOnly(this.claimsCheckOnly[i]);
-          }
+          this.logger.info(`Processing claims checking them only...`)
+          await this.processClaimsCheckOnly()
           this.client.disconnect();
           return
         }
         if (this.claims.length > 0) {
-            for (let i = 0; i < this.claims.length; i++) {
-                this.logger.info(`Processing claim ${i} for ${this.claims[i].alias}`);
-                await this.processClaim(this.claims[i]);
-            }
+          this.logger.info(`Processing claims...`)
+          await this.processClaims()
         }
         if (this.claimThirdParty?.targets.length > 0) {
-          const promiseArray = []
-          for (let i = 0; i < this.claimThirdParty.targets.length; i++) {
-              this.logger.info(`Processing third party claim ${i} for ${this.claimThirdParty.targets[i].alias}`);
-              promiseArray.push(this.processClaimThirdParty(this.claimThirdParty.claimerKeystore,this.claimThirdParty.targets[i]));
-          }
-          await Promise.all(promiseArray)
+          this.logger.info(`Processing third party claims...`)
+          await this.processClaimsThirdParty()
         } 
         if (this.transactions.length > 0) {
-            for (let i = 0; i < this.transactions.length; i++) {
-                this.logger.info(`Processing tx ${i} from ${this.transactions[i].sender.alias} to ${this.transactions[i].receiver.alias}`);
-                await this.processTx(this.transactions[i]);
-            }
+          this.logger.info(`Processing transfers...`)
+          await this.processTransfers()
         }
+        
         this.client.disconnect();
     }
 
-    private async processTx(tx: Transaction): Promise<void> {
-        if (!tx.receiver.address) {
-            this.logger.info(`Empty receiver address for '${tx.receiver.alias}', not sending.`);
-            return
-        }
+    private async initClient(): Promise<void> {
+      await this.client.api()
+    }
 
-        const amount = await this.determineAmount(tx.restriction, tx.sender.keystore, tx.receiver.address);
-
-        return this.client.send(tx.sender.keystore, tx.receiver.address, amount);
+    private async processClaims(): Promise<void> {
+      for (let i = 0; i < this.claims.length; i++) {
+        this.logger.info(`Processing claim ${i} for ${this.claims[i].alias}`);
+        await this.processClaim(this.claims[i]);
+      }
     }
 
     private async processClaim(claim: Claim): Promise<void> {
@@ -88,8 +81,19 @@ export class Accountant {
           if(message.includes('Connection dropped') || message.includes('ECONNRESET')){
             this.logger.warn(`Retrying...`)
             await this.processClaim(claim)
+          }else{
+            throw error
           }
         }
+    }
+
+    private async processClaimsThirdParty(): Promise<void> {
+      const promiseArray = []
+      for (let i = 0; i < this.claimThirdParty.targets.length; i++) {
+          this.logger.info(`Processing third party claim ${i} for ${this.claimThirdParty.targets[i].alias}`);
+          promiseArray.push(this.processClaimThirdParty(this.claimThirdParty.claimerKeystore,this.claimThirdParty.targets[i]));
+      }
+      await Promise.all(promiseArray)
     }
 
     private async processClaimThirdParty(claimer: Keystore, validatorTarget: Target): Promise<void> {
@@ -101,10 +105,19 @@ export class Accountant {
         if(message.includes('Connection dropped') || message.includes('ECONNRESET')){
           this.logger.warn(`Retrying...`)
           await this.processClaimThirdParty(claimer,validatorTarget)
+        }else{
+          throw error
         }
       }
     }
     
+    private async processClaimsCheckOnly(): Promise<void> {
+      for (let i = 0; i < this.claimsCheckOnly.length; i++) {
+        this.logger.info(`Processing checkOnlyClaim ${i} for ${this.claimsCheckOnly[i].alias}`);
+        await this.processClaimCheckOnly(this.claimsCheckOnly[i]);
+      }
+    }
+
     private async processClaimCheckOnly(target: Target): Promise<void> {
       try {
         const unclaimedPayouts = await this.client.checkOnly(target.validatorAddress)
@@ -120,8 +133,28 @@ export class Accountant {
         if(message.includes('Connection dropped') || message.includes('ECONNRESET')){
           this.logger.warn(`Retrying...`)
           await this.processClaimCheckOnly(target)
+        }else{
+          throw error
         }
       }
+    }
+
+    private async processTransfers(): Promise<void> {
+      for (let i = 0; i < this.transactions.length; i++) {
+        this.logger.info(`Processing tx ${i} from ${this.transactions[i].sender.alias} to ${this.transactions[i].receiver.alias}`);
+        await this.processTransfer(this.transactions[i]);
+      }
+    }
+
+    private async processTransfer(tx: Transaction): Promise<void> {
+        if (!tx.receiver.address) {
+            this.logger.info(`Empty receiver address for '${tx.receiver.alias}', not sending.`);
+            return
+        }
+
+        const amount = await this.determineAmount(tx.restriction, tx.sender.keystore, tx.receiver.address);
+
+        return this.client.send(tx.sender.keystore, tx.receiver.address, amount);
     }
 
     private async determineAmount(restriction: TransactionRestriction, senderKeystore: Keystore, receiverAddr: string): Promise<Balance> {
