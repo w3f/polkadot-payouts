@@ -37,7 +37,13 @@ export interface Claim extends CommonActor {
 
 export interface ClaimThirdParty {
   claimerKeystore: Keystore;
+  parallelExecution?: ParallelExecution;
   targets: Array<Target>;
+}
+
+export interface ParallelExecution {
+  enabled: boolean;
+  degree: number;
 }
 
 export interface Target {
@@ -54,6 +60,12 @@ export interface AccountantInputConfig {
     minimumSenderBalance?: number;
     isDeepHistoryCheckForced?: boolean;
     gracePeriod?: GracePeriod;
+    retryPolicy?: RetryPolicy;
+}
+
+export interface RetryPolicy {
+  delayMillis: number;
+  maxAttempts: number;
 }
 
 export interface InputConfig extends AccountantInputConfig {

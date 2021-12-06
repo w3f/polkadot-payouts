@@ -18,7 +18,6 @@ export class Client extends ClientW3f {
   }
 
   public async checkOnly(validatorAddress: string ): Promise<number[]> {
-    await this.handleConnection()
 
     const currentEra = (await this._api.query.staking.activeEra()).unwrapOr(null);
     if (!currentEra) {
@@ -41,20 +40,7 @@ export class Client extends ClientW3f {
     return unclaimedPayouts    
   }
 
-  private async handleConnection(): Promise<void> {
-    if(this.apiNotReady() ) { //if not init
-      this.logger.debug('init the api')
-      await this.connect(); //init
-    }
-    if(!this._api.isConnected){
-      this.logger.info("Trying to reconnect...")
-      await this._api.disconnect();
-      await this.connect();
-    }
-  }
-
   private async claimGeneral(validatorAddress: string, claimerKeystore: Keystore, isHistoryCheckForced = false, gracePeriod: GracePeriod = {enabled: false, eras: 0} ): Promise<void> {
-    await this.handleConnection()
 
     const maxBatchedTransactions = 9;
     const keyPair = this.getKeyPair(claimerKeystore);
