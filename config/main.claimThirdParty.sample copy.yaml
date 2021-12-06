@@ -8,6 +8,9 @@ claimThirdParty:
   claimerKeystore:
     filePath: /path/to/validator-000/keystore
     passwordPath: /path/to/validator-000/keystore/password
+  parallelExecution:
+    enabled: false
+    degree: 4  
   targets:
   - alias: validator-000
     validatorAddress: "<validator-000-stash-address>"

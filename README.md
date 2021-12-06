@@ -54,8 +54,9 @@ claimsThirdParty:
 You should define the RPC endpoint to use in the `wsEndpoint` field.
 
 ### ClaimsThirdPary
-This block is composed by two elements:  
+This block is composed by three elements:  
 - The Claimer Keystore: it includes the information about the claimer account keystore, in particular the paths to the keystore file and the password file.  
+- ParallelExecution: it is an optional field. If enabled, the requests will be handled in a parallel fascion. Don't increase the degree of parallelism field too much if you don't want to run out of memory or to be filtered out from the substrate node you are connected with.
 - An array of elements/targets that describe each of the reward claims to perform. It should include information on the addresses of the validators you are willing to take care of
 
 # About - Keystore Password File

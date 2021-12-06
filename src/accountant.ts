@@ -82,12 +82,42 @@ export class Accountant {
     }
 
     private async processClaimsThirdParty(): Promise<void> {
-      const promiseArray = []
-      for (let i = 0; i < this.claimThirdParty.targets.length; i++) {
-          this.logger.info(`Processing third party claim ${i} for ${this.claimThirdParty.targets[i].alias}`);
-          promiseArray.push(this.processClaimThirdParty(this.claimThirdParty.claimerKeystore,this.claimThirdParty.targets[i]));
+      const parallelExecutionConfig = this.claimThirdParty.parallelExecution
+      if(parallelExecutionConfig?.enabled){
+        await this.processClaimsThirdPartyParallel()
       }
-      await Promise.all(promiseArray)
+      else{
+        await this.processClaimsThirdPartySerial()
+      }
+    }
+
+    private async processClaimsThirdPartySerial(): Promise<void> {
+      for (let i = 0; i < this.claimThirdParty.targets.length; i++) {
+        this.logger.info(`Processing third party claim ${i} for ${this.claimThirdParty.targets[i].alias}`);
+        await this.processClaimThirdParty(this.claimThirdParty.claimerKeystore,this.claimThirdParty.targets[i]);
+      }
+    }
+
+    private async processClaimsThirdPartyParallel(): Promise<void> {
+      const parallelExecutionConfig = this.claimThirdParty.parallelExecution
+
+      //A degree of parallelism too big could make crush the API => Chunk splitting
+      const degree = parallelExecutionConfig?.degree
+      const targetsChunks: Target[][] = []
+      for (let i = 0; i < this.claimThirdParty.targets.length; i += degree) {
+        const chunk = this.claimThirdParty.targets.slice(i, i + degree)
+        targetsChunks.push(chunk)
+      } 
+      
+      for (const chunk of targetsChunks) {
+        const promises = chunk.map(target => {
+          this.logger.info(`Processing third party claim for ${target.alias}:${target.validatorAddress}`)
+          return this.processClaimThirdParty(this.claimThirdParty.claimerKeystore,target)
+        })
+
+        await Promise.all(promises)
+      }
+
     }
 
     private async processClaimThirdParty(claimer: Keystore, validatorTarget: Target): Promise<void> {
@@ -146,11 +176,11 @@ export class Accountant {
           this.logger.error(`Could not process the claim for ${alias}: ${error}`);
           const message = getErrorMessage(error)
           if(
-            (
-              message.includes('Connection dropped') || 
-              message.includes('ECONNRESET') || 
-              message.includes('WebSocket is not connected')
-              ) && 
+            // (
+            //   message.includes('Connection dropped') || 
+            //   message.includes('ECONNRESET') || 
+            //   message.includes('WebSocket is not connected')
+            //   ) && 
             ++attempts < maxAttempts
             ){
             this.logger.warn(`Retrying...`)

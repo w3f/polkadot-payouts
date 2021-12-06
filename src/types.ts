@@ -37,7 +37,13 @@ export interface Claim extends CommonActor {
 
 export interface ClaimThirdParty {
   claimerKeystore: Keystore;
+  parallelExecution?: ParallelExecution;
   targets: Array<Target>;
+}
+
+export interface ParallelExecution {
+  enabled: boolean;
+  degree: number;
 }
 
 export interface Target {
