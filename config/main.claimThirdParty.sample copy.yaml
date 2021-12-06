@@ -1,5 +1,8 @@
 logLevel: info
 wsEndpoint: "wss://kusama-rpc.polkadot.io/"
+retryPolicy: 
+  delayMillis: 10000
+  maxAttempts: 5
 isDeepHistoryCheckForced: false
 gracePeriod:
   enabled: false

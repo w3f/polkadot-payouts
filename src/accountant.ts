@@ -10,9 +10,9 @@ import {
     Transaction,
     TransactionRestriction,
     Claim,
-    ApiClient, AccountantInputConfig, ClaimThirdParty, Target, GracePeriod
+    ApiClient, AccountantInputConfig, ClaimThirdParty, Target, GracePeriod, RetryPolicy
 } from './types';
-import { delay, getErrorMessage } from './utils';
+import { delay } from './utils';
 
 export class Accountant {
     private minimumSenderBalance: Balance;
@@ -22,6 +22,7 @@ export class Accountant {
     private claims: Array<Claim> = [];
     private claimThirdParty: ClaimThirdParty;
     private claimsCheckOnly: Array<Target> = []
+    private retryPolicy: RetryPolicy = {delayMillis: 10000, maxAttempts: 5}
 
     constructor(
         cfg: AccountantInputConfig,
@@ -34,6 +35,7 @@ export class Accountant {
         if(cfg.claimsCheckOnly) this.claimsCheckOnly = cfg.claimsCheckOnly
         if(cfg.isDeepHistoryCheckForced) this.isDeepHistoryCheckForced = cfg.isDeepHistoryCheckForced
         if(cfg.gracePeriod) this.gracePeriod = cfg.gracePeriod
+        if(cfg.retryPolicy) this.retryPolicy = cfg.retryPolicy
     }
 
     async run(): Promise<void> {
@@ -167,25 +169,15 @@ export class Accountant {
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     private async handleConnectionRetries(f: { (): any },alias: string): Promise<void> {
       let attempts = 0
-      const maxAttempts = 5
       for(;;){
         try {
-          //function
           await f()
           return
         } catch (error) {
           this.logger.error(`Could not process the claim for ${alias}: ${error}`);
-          const message = getErrorMessage(error)
-          if(
-            // (
-            //   message.includes('Connection dropped') || 
-            //   message.includes('ECONNRESET') || 
-            //   message.includes('WebSocket is not connected')
-            //   ) && 
-            ++attempts < maxAttempts
-            ){
+          if(++attempts < this.retryPolicy.maxAttempts){
             this.logger.warn(`Retrying...`)
-            await delay(10000) //wait x seconds before retrying
+            await delay(this.retryPolicy.delayMillis) //wait x seconds before retrying
           }
           else{
             throw error

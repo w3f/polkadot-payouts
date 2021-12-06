@@ -60,6 +60,12 @@ export interface AccountantInputConfig {
     minimumSenderBalance?: number;
     isDeepHistoryCheckForced?: boolean;
     gracePeriod?: GracePeriod;
+    retryPolicy?: RetryPolicy;
+}
+
+export interface RetryPolicy {
+  delayMillis: number;
+  maxAttempts: number;
 }
 
 export interface InputConfig extends AccountantInputConfig {

@@ -1,6 +1,9 @@
 logLevel: info
 wsEndpoint: "wss://rpc.polkadot.io/"
 isDeepHistoryCheckForced: true
+retryPolicy: 
+  delayMillis: 10000
+  maxAttempts: 5
 gracePeriod:
   enabled: false
   eras: 4
