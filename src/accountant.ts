@@ -12,7 +12,7 @@ import {
     Claim,
     ApiClient, AccountantInputConfig, ClaimThirdParty, Target, GracePeriod, RetryPolicy
 } from './types';
-import { delay } from './utils';
+import { delay, getErrorMessage } from './utils';
 
 export class Accountant {
     private minimumSenderBalance: Balance;
@@ -175,7 +175,11 @@ export class Accountant {
           return
         } catch (error) {
           this.logger.error(`Could not process the claim for ${alias}: ${error}`);
-          if(++attempts < this.retryPolicy.maxAttempts){
+          const errorMessage = getErrorMessage(error)
+          if(
+            !errorMessage.includes("Unable to decode using the supplied passphrase") && //there is no way to recover from this
+            ++attempts < this.retryPolicy.maxAttempts 
+            ){
             this.logger.warn(`Retrying...`)
             await delay(this.retryPolicy.delayMillis) //wait x seconds before retrying
           }
