@@ -36,7 +36,7 @@
     "@types/js-yaml": "^3.12.5",
     "@types/mocha": "^9.0.0",
     "@types/sinon": "^7.5.2",
-    "@types/tmp": "^0.1.0",
+    "@types/tmp": "^0.2.2",
     "@typescript-eslint/eslint-plugin": "^2.27.0",
     "@typescript-eslint/parser": "^2.27.0",
     "@w3f/test-utils": "^1.2.13",
