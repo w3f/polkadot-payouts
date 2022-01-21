@@ -1,3 +1,4 @@
+import '@polkadot/api-augment'; //https://github.com/polkadot-js/api/issues/4450
 import fs from 'fs-extra';
 import { Keyring } from '@w3f/polkadot-api-client';
 import { should } from 'chai';
