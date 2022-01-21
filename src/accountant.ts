@@ -10,9 +10,9 @@ import {
     Transaction,
     TransactionRestriction,
     Claim,
-    ApiClient, AccountantInputConfig, ClaimThirdParty, Target, GracePeriod
+    ApiClient, AccountantInputConfig, ClaimThirdParty, Target, GracePeriod, RetryPolicy
 } from './types';
-import { getErrorMessage } from './utils';
+import { delay, getErrorMessage } from './utils';
 
 export class Accountant {
     private minimumSenderBalance: Balance;
@@ -22,6 +22,7 @@ export class Accountant {
     private claims: Array<Claim> = [];
     private claimThirdParty: ClaimThirdParty;
     private claimsCheckOnly: Array<Target> = []
+    private retryPolicy: RetryPolicy = {delayMillis: 10000, maxAttempts: 5}
 
     constructor(
         cfg: AccountantInputConfig,
@@ -34,39 +35,127 @@ export class Accountant {
         if(cfg.claimsCheckOnly) this.claimsCheckOnly = cfg.claimsCheckOnly
         if(cfg.isDeepHistoryCheckForced) this.isDeepHistoryCheckForced = cfg.isDeepHistoryCheckForced
         if(cfg.gracePeriod) this.gracePeriod = cfg.gracePeriod
+        if(cfg.retryPolicy) this.retryPolicy = cfg.retryPolicy
     }
 
     async run(): Promise<void> {
+        await this.initClient()
+
         if(this.claimsCheckOnly.length > 0) {
-          for (let i = 0; i < this.claimsCheckOnly.length; i++) {
-            this.logger.info(`Processing checkOnlyClaim ${i} for ${this.claimsCheckOnly[i].alias}`);
-            await this.processClaimCheckOnly(this.claimsCheckOnly[i]);
-          }
-          this.client.disconnect();
-          return
+          this.logger.info(`Processing claims checking them only...`)
+          await this.processClaimsCheckOnly()
         }
         if (this.claims.length > 0) {
-            for (let i = 0; i < this.claims.length; i++) {
-                this.logger.info(`Processing claim ${i} for ${this.claims[i].alias}`);
-                await this.processClaim(this.claims[i]);
-            }
+          this.logger.info(`Processing claims...`)
+          await this.processClaims()
         }
         if (this.claimThirdParty?.targets.length > 0) {
-          for (let i = 0; i < this.claimThirdParty.targets.length; i++) {
-              this.logger.info(`Processing third party claim ${i} for ${this.claimThirdParty.targets[i].alias}`);
-              await this.processClaimThirdParty(this.claimThirdParty.claimerKeystore,this.claimThirdParty.targets[i]);
-          }
+          this.logger.info(`Processing third party claims...`)
+          await this.processClaimsThirdParty()
         } 
         if (this.transactions.length > 0) {
-            for (let i = 0; i < this.transactions.length; i++) {
-                this.logger.info(`Processing tx ${i} from ${this.transactions[i].sender.alias} to ${this.transactions[i].receiver.alias}`);
-                await this.processTx(this.transactions[i]);
-            }
+          this.logger.info(`Processing transfers...`)
+          await this.processTransfers()
         }
+        
         this.client.disconnect();
     }
 
-    private async processTx(tx: Transaction): Promise<void> {
+    private async initClient(): Promise<void> {
+      let timer: NodeJS.Timeout
+      const timeoutPromise = new Promise( (_resolve, reject) => timer=setTimeout(()=>reject(`Initial connection timed out, ws endpoint may be misconfigured`), 30000) )
+      const apiPromise = this.client.api()
+      await Promise.race([apiPromise,timeoutPromise]).finally(()=>clearTimeout(timer))
+    }
+
+    private async processClaims(): Promise<void> {
+      for (let i = 0; i < this.claims.length; i++) {
+        this.logger.info(`Processing claim ${i} for ${this.claims[i].alias}`);
+        await this.processClaim(this.claims[i]);
+      }
+    }
+
+    private async processClaim(claim: Claim): Promise<void> {
+      await this.handleConnectionRetries(
+        async () => {
+          await this.client.claim(claim.keystore, this.isDeepHistoryCheckForced, this.gracePeriod)
+        },
+        claim.alias
+      )
+    }
+
+    private async processClaimsThirdParty(): Promise<void> {
+      const parallelExecutionConfig = this.claimThirdParty.parallelExecution
+      if(parallelExecutionConfig?.enabled){
+        await this.processClaimsThirdPartyParallel()
+      }
+      else{
+        await this.processClaimsThirdPartySerial()
+      }
+    }
+
+    private async processClaimsThirdPartySerial(): Promise<void> {
+      for (let i = 0; i < this.claimThirdParty.targets.length; i++) {
+        this.logger.info(`Processing third party claim ${i} for ${this.claimThirdParty.targets[i].alias}`);
+        await this.processClaimThirdParty(this.claimThirdParty.claimerKeystore,this.claimThirdParty.targets[i]);
+      }
+    }
+
+    private async processClaimsThirdPartyParallel(): Promise<void> {
+      const parallelExecutionConfig = this.claimThirdParty.parallelExecution
+
+      //A degree of parallelism too big could make the API crush => Chunk splitting
+      const degree = parallelExecutionConfig?.degree
+      const targetsChunks: Target[][] = []
+      for (let i = 0; i < this.claimThirdParty.targets.length; i += degree) {
+        const chunk = this.claimThirdParty.targets.slice(i, i + degree)
+        targetsChunks.push(chunk)
+      } 
+      
+      for (const chunk of targetsChunks) {
+        const promises = chunk.map(target => {
+          this.logger.info(`Processing third party claim for ${target.alias}:${target.validatorAddress}`)
+          return this.processClaimThirdParty(this.claimThirdParty.claimerKeystore,target)
+        })
+
+        await Promise.all(promises)
+      }
+
+    }
+
+    private async processClaimThirdParty(claimer: Keystore, validatorTarget: Target): Promise<void> {
+      await this.handleConnectionRetries(
+        async () => {
+          await this.client.claimForValidator(validatorTarget.validatorAddress,claimer,this.isDeepHistoryCheckForced, this.gracePeriod);
+        },
+        validatorTarget.alias
+      )
+    }
+    
+    private async processClaimsCheckOnly(): Promise<void> {
+      for (let i = 0; i < this.claimsCheckOnly.length; i++) {
+        this.logger.info(`Processing checkOnlyClaim ${i} for ${this.claimsCheckOnly[i].alias}`);
+        await this.processClaimCheckOnly(this.claimsCheckOnly[i]);
+      }
+    }
+
+    private async processClaimCheckOnly(target: Target): Promise<void> {
+      await this.handleConnectionRetries(
+        async () => {
+          await this.client.checkOnly(target.validatorAddress)
+        },
+        target.validatorAddress
+      )
+    }
+
+    private async processTransfers(): Promise<void> {
+      for (let i = 0; i < this.transactions.length; i++) {
+        this.logger.info(`Processing tx ${i} from ${this.transactions[i].sender.alias} to ${this.transactions[i].receiver.alias}`);
+        await this.processTransfer(this.transactions[i]);
+      }
+    }
+
+    private async processTransfer(tx: Transaction): Promise<void> {
         if (!tx.receiver.address) {
             this.logger.info(`Empty receiver address for '${tx.receiver.alias}', not sending.`);
             return
@@ -77,50 +166,30 @@ export class Accountant {
         return this.client.send(tx.sender.keystore, tx.receiver.address, amount);
     }
 
-    private async processClaim(claim: Claim): Promise<void> {
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
+    private async handleConnectionRetries(f: { (): any },alias: string): Promise<void> {
+      let attempts = 0
+      for(;;){
         try {
-          await this.client.claim(claim.keystore, this.isDeepHistoryCheckForced, this.gracePeriod);
-        } catch (error: unknown) {
-          this.logger.error(`Could not process the claim for ${claim.alias}: ${error}`);
-          const message = getErrorMessage(error)
-          if(message.includes('Connection dropped') || message.includes('ECONNRESET')){
+          await f()
+          return
+        } catch (error) {
+          this.logger.error(`Could not process the claim for ${alias}: ${error}`);
+          const errorMessage = getErrorMessage(error)
+          if(
+            !errorMessage.includes("Unable to decode using the supplied passphrase") && //there is no way to recover from this
+            ++attempts < this.retryPolicy.maxAttempts 
+            ){
             this.logger.warn(`Retrying...`)
-            await this.processClaim(claim)
+            await delay(this.retryPolicy.delayMillis) //wait x seconds before retrying
+          }
+          else{
+            throw error
           }
         }
-    }
-
-    private async processClaimThirdParty(claimer: Keystore, validatorTarget: Target): Promise<void> {
-      try {
-        await this.client.claimForValidator(validatorTarget.validatorAddress,claimer,this.isDeepHistoryCheckForced, this.gracePeriod);
-      } catch (error) {
-        this.logger.error(`Could not process the claim for ${validatorTarget.alias}: ${error}`);
-        const message = getErrorMessage(error)
-        if(message.includes('Connection dropped') || message.includes('ECONNRESET')){
-          this.logger.warn(`Retrying...`)
-          await this.processClaimThirdParty(claimer,validatorTarget)
-        }
       }
     }
-    
-    private async processClaimCheckOnly(target: Target): Promise<void> {
-      try {
-        const unclaimedPayouts = await this.client.checkOnly(target.validatorAddress)
-        if(unclaimedPayouts.length>0){
-          this.logger.info(`${target.alias} has unclaimed rewards for era(s) ${unclaimedPayouts.toString()}`);
-        }
-        else{
-          this.logger.info(`All the payouts have been claimed for validator ${target.alias}`);
-        }
-      } catch (error) {
-        this.logger.error(`Could not process the claim for ${target.alias}: ${error}`);
-        const message = getErrorMessage(error)
-        if(message.includes('Connection dropped') || message.includes('ECONNRESET')){
-          this.logger.warn(`Retrying...`)
-          await this.processClaimCheckOnly(target)
-        }
-      }
-    }
+    /* eslint-enable  @typescript-eslint/no-explicit-any */
 
     private async determineAmount(restriction: TransactionRestriction, senderKeystore: Keystore, receiverAddr: string): Promise<Balance> {
         if (restriction.desired &&

@@ -7,3 +7,7 @@ export const getErrorMessage = (error: unknown): string => {
   }
   return errorString
 }
+
+export const delay = (ms: number): Promise<void> =>{
+  return new Promise( resolve => setTimeout(resolve, ms) );
+}

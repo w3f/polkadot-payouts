@@ -1,5 +1,8 @@
 logLevel: info
 wsEndpoint: "wss://kusama-rpc.polkadot.io/"
+retryPolicy: 
+  delayMillis: 10000
+  maxAttempts: 5
 isDeepHistoryCheckForced: false
 gracePeriod:
   enabled: false
@@ -8,6 +11,9 @@ claimThirdParty:
   claimerKeystore:
     filePath: /path/to/validator-000/keystore
     passwordPath: /path/to/validator-000/keystore/password
+  parallelExecution:
+    enabled: false
+    degree: 4  
   targets:
   - alias: validator-000
     validatorAddress: "<validator-000-stash-address>"
