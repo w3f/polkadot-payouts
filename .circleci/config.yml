@@ -36,7 +36,7 @@ jobs:
 
   buildImage:
     docker:
-      - image: web3f/ci-commons:v2.4.15
+      - image: web3f/ci-commons:v2.4.16
     steps:
       - checkout
       - setup_remote_docker:
@@ -48,7 +48,7 @@ jobs:
 
   publishImage:
     docker:
-      - image: web3f/ci-commons:v2.4.15
+      - image: web3f/ci-commons:v2.4.16
     steps:
       - checkout
       - setup_remote_docker
