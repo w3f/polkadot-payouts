@@ -59,6 +59,7 @@ export interface AccountantInputConfig {
 export interface InputConfig extends AccountantInputConfig {
   wsEndpoint: string;
   logLevel: string;
+  format: string;
 }
 
 export interface GracePeriod {
