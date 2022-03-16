@@ -667,10 +667,10 @@
   dependencies:
     winston "^3.3.3"
 
-"@w3f/polkadot-api-client@^1.2.13":
-  version "1.2.16"
-  resolved "https://registry.yarnpkg.com/@w3f/polkadot-api-client/-/polkadot-api-client-1.2.16.tgz#27bd7c61ad0ae131722f15d7c5002341344787e9"
-  integrity sha512-pUKtVSUEdRuzz5dxXy8vAju97h+ZLDfPHazGp255J70NdAiH9tTD+NLfDZ1fTqoNYXet9v7wfJ9aF/rPGCd8SA==
+"@w3f/polkadot-api-client@^1.2.18":
+  version "1.2.18"
+  resolved "https://registry.yarnpkg.com/@w3f/polkadot-api-client/-/polkadot-api-client-1.2.18.tgz#026bbfd1497edbff160db9860c514b2ee281ab9a"
+  integrity sha512-t8C+T+BcXLvPWNBP046EgKmPvBZ0bjxmo/7Fk2To4iFAbjPeJxWCPK4kg6lZsGYXeXq67aActcYXs3wb3siD4A==
   dependencies:
     "@polkadot/api" "^7.4.1"
     "@w3f/logger" "^0.4.2"
