@@ -1,6 +1,6 @@
 {
   "name": "accountant",
-  "version": "0.4.20",
+  "version": "0.4.21",
   "description": "Automated transfers among accounts",
   "repository": "git@github.com:w3f/accountant.git",
   "author": "W3F Infrastructure Team <devops@web3.foundation>",
@@ -45,8 +45,8 @@
     "mocha": "^9.2.0",
     "sinon": "^9.0.1",
     "tmp": "^0.1.0",
-    "ts-node": "^9.1.1",
+    "ts-node": "^10.8.0",
     "tslint": "^6.1.0",
-    "typescript": "^4.5.4"
+    "typescript": "^4.7.2"
   }
 }
