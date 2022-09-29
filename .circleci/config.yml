@@ -15,7 +15,7 @@ jobs:
   e2eTests:
     docker:
       - image: web3f/node:v0.1.3
-      - image: parity/polkadot:v0.9.8
+      - image: parity/polkadot:v0.9.29
         name: polkadot
         command: --chain=kusama-dev --alice --ws-port 11000 --ws-external --rpc-methods=Unsafe --rpc-cors=all
     steps:
