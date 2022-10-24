@@ -108,7 +108,7 @@ export class Client extends ClientW3f {
     }
     let lastReward: number;
     if ( isHistoryCheckForced || ledger.claimedRewards.length == 0 ) {
-        lastReward = (await this._api.query.staking.historyDepth()).toNumber();
+        lastReward = this._api.consts.staking.historyDepth.toNumber();
     } else {
         lastReward = ledger.claimedRewards.pop().toNumber();
     }

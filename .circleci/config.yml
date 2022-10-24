@@ -3,7 +3,7 @@ version: 2
 jobs:
   unitTests:
     docker:
-      - image: web3f/node:v0.1.3
+      - image: web3f/node:v1
     steps:
       - checkout
       - run: yarn
@@ -14,8 +14,8 @@ jobs:
 
   e2eTests:
     docker:
-      - image: web3f/node:v0.1.3
-      - image: parity/polkadot:v0.9.8
+      - image: web3f/node:v1
+      - image: parity/polkadot:latest
         name: polkadot
         command: --chain=kusama-dev --alice --ws-port 11000 --ws-external --rpc-methods=Unsafe --rpc-cors=all
     steps:
@@ -28,7 +28,7 @@ jobs:
 
   yarnLint:
     docker:
-      - image: web3f/node-dind:v1.0.0
+      - image: web3f/node-dind:v1
     steps:
       - checkout
       - run: yarn
@@ -36,7 +36,7 @@ jobs:
 
   buildImage:
     docker:
-      - image: web3f/ci-commons:v2.4.15
+      - image: web3f/ci-commons:v3
     steps:
       - checkout
       - setup_remote_docker:
@@ -48,7 +48,7 @@ jobs:
 
   publishImage:
     docker:
-      - image: web3f/ci-commons:v2.4.15
+      - image: web3f/ci-commons:v3
     steps:
       - checkout
       - setup_remote_docker
