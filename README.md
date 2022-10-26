@@ -1,4 +1,6 @@
-[![CircleCI](https://circleci.com/gh/w3f/polkadot-payouts.svg?style=svg)](https://circleci.com/gh/w3f/polkadot-payouts)
+# ⚠️ Deprecation
+
+The app has been deprecated in favour of https://github.com/w3f/polkadot-k8s-payouts
 
 # polkadot-payouts
 
