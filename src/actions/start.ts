@@ -9,7 +9,7 @@ import { InputConfig } from '../types';
 export async function startAction(cmd): Promise<void> {
     const cfg = new Config<InputConfig>().parse(cmd.config);
 
-    const logger = createLogger(cfg.logLevel);
+    const logger = createLogger(cfg.logLevel, cmd.format);
 
     const client = new Client(cfg.wsEndpoint, logger);
 
